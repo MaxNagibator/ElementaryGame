@@ -7,17 +7,82 @@
     <div>
         <label>Периодический закон и периодическая система Д. И. Менделеева. Электронный период в развитии химии.</label>
     </div>
-    <button class="btn btn-info">Одиночный</button>
-    <button class="btn btn-info">Командный</button>
-    <div>
-        bla bla
+    <div id="page-1" class="game-page">
+        <button class="btn btn-info" onclick="setMode(1)">Одиночный</button>
+        <button class="btn btn-info" onclick="setMode(2)">Командный</button>
     </div>
-    <button class="btn btn-success" style="display:block;" onclick="ruletkaStart()">123123</button>
-    <div>pimpa</div>
-    <img id="ruletka" src="~/images/ruletka.png" style="width: 250px;" />
+    <div id="page-2" class="game-page">
+        <button class="btn btn-info" onclick="setSkin(1)">выбрать скин</button>
+        <button class="btn btn-success" style="display:block;" onclick="ruletkaStart()">123123</button>
+        <div>pimpa</div>
+        <img id="ruletka" src="~/images/ruletka.png" style="width: 250px;" />
+    </div>
+    <div id="page-3" class="game-page">
+        <button class="btn btn-info" onclick="setLevel(1)">Начальный</button>
+        <button class="btn btn-info" onclick="setLevel(2)">Продвинутый</button>
+    </div>
+    <div id="page-4" class="game-page">
+        <button class="btn btn-info" onclick="getQuestion()">поехали</button>
+    </div>
 </div>
 
 <script>
+    var currentPage = 1
+    function init(){
+        refreshPage();
+    }
+
+    function changePage(page){
+        currentPage = page;
+        refreshPage();
+    }
+
+    function refreshPage(){
+        console.log(123)
+        document.querySelectorAll(".game-page").forEach(element => {
+            element.classList.add('hidden');
+        });
+
+        document.getElementById('page-'+currentPage).classList.remove('hidden');
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        init();
+    });
+
+    game = {
+
+    }
+
+    function setMode(val){
+        game.mode = val;
+        changePage(2);
+    }
+
+    function setSkin(val){
+        changePage(3);
+    }
+
+    function setLevel(val){
+        game.level = val;
+        changePage(4);
+    }
+
+    function getQuestion(){
+
+        SendRequest({
+        method: 'POST',
+        url: '/Home/GetNextQuestion',
+        body: {
+            playerSecret: "test"
+        },
+        success(data) {
+            let question = JSON.parse(data.responseText);
+            alert(question.text);
+        }
+    });
+    }
+
     var currentAngle = 0;
 
     function ruletkaStart() {
@@ -39,11 +104,58 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+        function SendRequest(options) {
+        let _this = {};
+        let defaultOptions = {
+            method: 'POST',
+        }
+
+        _this.options = Object.assign({}, defaultOptions, options);
+
+        _this.Send = function () {
+            let xhr = new XMLHttpRequest();
+            xhr.open(_this.options.method, _this.options.url, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (this.readyState != 4) {
+                    return;
+                }
+                if (this.status == 200) {
+                    if (_this.options.success) {
+                        _this.options.success(this);
+                    }
+                } else if (this.status == 403) {
+                    showAlert('Внимание', this.responseText, 5);
+                } else {
+                    if (_this.options.error) {
+                        _this.options.error(this);
+                    } else {
+                        showAlert('Ошибка', 'чтото пошло не так', 2);
+                    }
+                }
+                if (_this.options.always) {
+                    _this.options.always(this);
+                }
+            };
+            xhr.send(JSON.stringify(_this.options.body));
+        }
+        _this.Send();
+    }
+
 </script>
 
 <style>
     .animation {
         /* transform: rotate(360deg);*/
         /* transition: all 1s ease-in; */
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .game-page {
+        width: 100%;
+        min-height: 200px;
     }
 </style>
