@@ -19,6 +19,13 @@ namespace Elementary.Controllers
         }
 
         [HttpPost]
+        public JsonResult StartGame()
+        {
+            GameValue.StartGame();
+            return new JsonResult(new { Text = "Vrum Wrum" });
+        }
+
+        [HttpPost]
         public JsonResult GetNextQuestion()
         {
             var question = GameValue.GetNextQuestion();

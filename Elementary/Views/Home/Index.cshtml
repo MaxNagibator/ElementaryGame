@@ -2,14 +2,22 @@
     ViewData["Title"] = "Home Page";
 }
 
+<script src="~/js/site.js" asp-append-version="true"></script>
+
 <div class="text-center">
     <h1 class="display-4">Элементарно! (или не совсем)</h1>
     <div>
         <label>Периодический закон и периодическая система Д. И. Менделеева. Электронный период в развитии химии.</label>
     </div>
+
+    <button class="btn btn-success" onclick="startGame()">начинаем</button>
+
     <div id="page-1" class="game-page">
         <button class="btn btn-info" onclick="setMode(1)">Одиночный</button>
         <button class="btn btn-info" onclick="setMode(2)">Командный</button>
+        <button class="btn btn-info" onclick="getQuestion()">поехали</button>
+        <div id="QuestionBlock">
+        </div>
     </div>
     <div id="page-2" class="game-page">
         <button class="btn btn-info" onclick="setSkin(1)">выбрать скин</button>
@@ -27,120 +35,6 @@
 </div>
 
 <script>
-    var currentPage = 1
-    function init(){
-        refreshPage();
-    }
-
-    function changePage(page){
-        currentPage = page;
-        refreshPage();
-    }
-
-    function refreshPage(){
-        console.log(123)
-        document.querySelectorAll(".game-page").forEach(element => {
-            element.classList.add('hidden');
-        });
-
-        document.getElementById('page-'+currentPage).classList.remove('hidden');
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        init();
-    });
-
-    game = {
-
-    }
-
-    function setMode(val){
-        game.mode = val;
-        changePage(2);
-    }
-
-    function setSkin(val){
-        changePage(3);
-    }
-
-    function setLevel(val){
-        game.level = val;
-        changePage(4);
-    }
-
-    function getQuestion(){
-
-        SendRequest({
-        method: 'POST',
-        url: '/Home/GetNextQuestion',
-        body: {
-            playerSecret: "test"
-        },
-        success(data) {
-            let question = JSON.parse(data.responseText);
-            alert(question.text);
-        }
-    });
-    }
-
-    var currentAngle = 0;
-
-    function ruletkaStart() {
-        const sectorValue = getRandomInt(1, 12);
-        // 360 градусов это 12 сектаров, значит 1 сектор это 360 / 12 = 30 градусов
-        const sector = 30
-
-        ruletkaDiv = document.getElementById('ruletka');
-
-        var rounds = getRandomInt(2, 5);
-        const time = getRandomInt(3, 8);
-        angle = rounds * 360 + sectorValue * sector;
-        currentAngle += angle
-        ruletkaDiv.style.transition = `transform ${time}s cubic-bezier(0.1, 0.7, 0.1, 1)`;
-        ruletkaDiv.style.transform = `rotate(${currentAngle}deg)`;
-    }
-
-    function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-        function SendRequest(options) {
-        let _this = {};
-        let defaultOptions = {
-            method: 'POST',
-        }
-
-        _this.options = Object.assign({}, defaultOptions, options);
-
-        _this.Send = function () {
-            let xhr = new XMLHttpRequest();
-            xhr.open(_this.options.method, _this.options.url, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (this.readyState != 4) {
-                    return;
-                }
-                if (this.status == 200) {
-                    if (_this.options.success) {
-                        _this.options.success(this);
-                    }
-                } else if (this.status == 403) {
-                    showAlert('Внимание', this.responseText, 5);
-                } else {
-                    if (_this.options.error) {
-                        _this.options.error(this);
-                    } else {
-                        showAlert('Ошибка', 'чтото пошло не так', 2);
-                    }
-                }
-                if (_this.options.always) {
-                    _this.options.always(this);
-                }
-            };
-            xhr.send(JSON.stringify(_this.options.body));
-        }
-        _this.Send();
-    }
 
 </script>
 
@@ -157,5 +51,46 @@
     .game-page {
         width: 100%;
         min-height: 200px;
+    }
+
+    #QuestionBlock {
+        border: 1px solid;
+        border-radius: 10px;
+        margin: 5px;
+        padding: 10px;
+    }
+
+        #QuestionBlock .options-table {
+            width: 100%;
+        }
+
+            #QuestionBlock .options-table td {
+                padding: 5px;
+                border: 1px
+            }
+
+        #QuestionBlock .option-btn {
+            border: 1px solid;
+            border-radius: 10px;
+        }
+
+            #QuestionBlock .option-btn.active {
+                background-color: darkgreen;
+                color: white;
+            }
+
+    .alerts-body {
+        position: fixed;
+        top: 180px;
+        z-index: 999992;
+        width: 415px;
+        right: 0;
+        padding-right: 15px;
+    }
+
+    .alert .close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
     }
 </style>
