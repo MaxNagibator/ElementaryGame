@@ -70,15 +70,17 @@ function getQuestion() {
             if (question.options) {
                 let text = ''
                 const optionsDiv = document.createElement('div');
-                if (question.options.length != 4) {
+                if (question.options.length > 0) {
+                    text += "<div class='options-table'>";
                     for (let i = 0; i < question.options.length; i++) {
                         text += getOptionButton(question.options[i], true);
                     }
+                    text + "</div>"
                 } else {
-                    text = "<table class='options-table'>"
-                        + "<tr>" + getOptionButton(question.options[0]) + getOptionButton(question.options[1]) + "</tr>"
-                        + "<tr>" + getOptionButton(question.options[2]) + getOptionButton(question.options[2]) + "</tr>"
-                        + "</table>";
+                    text = "<div class='options-table'>"
+                         + getOptionButton(question.options[0], true) + getOptionButton(question.options[1], true)
+                         + getOptionButton(question.options[2], true) + getOptionButton(question.options[2], true)
+                        + "</div>";
                 }
 
 
