@@ -20,3 +20,89 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.animation {
+    /* transform: rotate(360deg);*/
+    /* transition: all 1s ease-in; */
+}
+
+.hidden {
+    display: none;
+}
+
+.game-page {
+    width: 100%;
+    min-height: 200px;
+}
+
+#QuestionBlock {
+    border: 1px solid;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 10px;
+}
+
+    #QuestionBlock .options-table {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 10px;
+    }
+
+        #QuestionBlock .options-table td {
+            padding: 5px;
+            border: 1px
+        }
+
+    #QuestionBlock .option-btn {
+        border: 1px solid;
+        border-radius: 10px;
+        min-height: 60px;
+        text-align: center;
+        padding: 15px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        #QuestionBlock .option-btn.active {
+            background-color: darkorange;
+            color: white;
+        }
+
+        #QuestionBlock .option-btn.right-answer {
+            background-color: darkgreen;
+            color: white;
+        }
+
+    #QuestionBlock .confirm-btn {
+        font-size: 20px;
+        margin-top: 20px;
+        min-height: 60px;
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    #QuestionBlock .explanation {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .alerts-body {
+        position: fixed;
+        top: 180px;
+        z-index: 999992;
+        width: 415px;
+        right: 0;
+        padding-right: 15px;
+    }
+
+.alert .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}

@@ -37,14 +37,21 @@ namespace Elementary.Controllers
             });
         }
 
-        [HttpPost]
-        public JsonResult SetAnswer(string value)
+        public class SetAnswerModel
         {
-            bool isCorrect = GameValue.SetAnswer(value);
+            public string Value { get; set; }
+        }
+
+        [HttpPost]
+        public JsonResult SetAnswer([FromBody] SetAnswerModel model)
+        {
+            bool isCorrect = GameValue.SetAnswer(model.Value);
+            var currentQuestion = GameValue.GetCurrentQuestion();
             return new JsonResult(new
             {
                 IsCorrect = isCorrect,
-                Explanation = GameValue.GetCurrentQuestion().Explanation,
+                Answer = currentQuestion.Answer,
+                Explanation = currentQuestion.Explanation,
             });
         }
 

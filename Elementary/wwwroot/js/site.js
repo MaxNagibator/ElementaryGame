@@ -68,21 +68,12 @@ function getQuestion() {
             block.appendChild(textDiv);
 
             if (question.options) {
-                let text = ''
                 const optionsDiv = document.createElement('div');
-                if (question.options.length > 0) {
-                    text += "<div class='options-table'>";
-                    for (let i = 0; i < question.options.length; i++) {
-                        text += getOptionButton(question.options[i], true);
-                    }
-                    text + "</div>"
-                } else {
-                    text = "<div class='options-table'>"
-                         + getOptionButton(question.options[0], true) + getOptionButton(question.options[1], true)
-                         + getOptionButton(question.options[2], true) + getOptionButton(question.options[2], true)
-                        + "</div>";
+                let text = "<div class='options-table'>";
+                for (let i = 0; i < question.options.length; i++) {
+                    text += "<div class='option-btn'>" + question.options[i] + "</div>"
                 }
-
+                text + "</div>"
 
                 optionsDiv.innerHTML = text;
                 block.appendChild(optionsDiv);
@@ -97,18 +88,53 @@ function getQuestion() {
                     });
                 });
             }
+
+            const confirmButton = document.createElement('button');
+            confirmButton.classList.add('confirm-btn','btn','btn-info');
+            confirmButton.innerHTML = "подтвердить ответ"
+            confirmButton.addEventListener('click', function (event) {
+                let activeBtns = document.querySelectorAll('#QuestionBlock .option-btn.active');
+                if (activeBtns.length > 0) {
+                    answer = activeBtns[0].innerHTML;
+                    sendAnswer(answer);
+                }
+            });
+            block.appendChild(confirmButton);
+
         }
     });
 }
 
-function getOptionButton(text, withoutTd) {
-    let text222 = "<div class='option-btn'>" + text + "</div>";
-    if (withoutTd) {
-        return text222;
-    } else {
-        return "<td>" + text222 + "</td>";
-    }
+function sendAnswer(answer) {
+    SendRequest({
+        method: 'POST',
+        url: '/Home/SetAnswer',
+        body: {
+            value: answer
+        },
+        success(data) {
+            let answer = JSON.parse(data.responseText);
+            let btns = document.querySelectorAll('#QuestionBlock .option-btn');
+            for (let i = 0; i < btns.length; i++) {
+                if (btns[i].innerHTML == answer.answer) {
+                    btns[i].classList.add('right-answer')
+                }
+            }
+
+            let confirmBtn = document.querySelectorAll('#QuestionBlock .confirm-btn');
+            confirmBtn[0].remove();
+
+            const explanationDiv = document.createElement('div');
+            explanationDiv.classList.add('explanation');
+            explanationDiv.innerHTML = answer.explanation
+
+            block = document.getElementById('QuestionBlock');
+            block.appendChild(explanationDiv);
+
+        }
+    });
 }
+
 
 var currentAngle = 0;
 
