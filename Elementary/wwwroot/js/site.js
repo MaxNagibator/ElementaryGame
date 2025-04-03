@@ -47,9 +47,11 @@ function startGame() {
 }
 
 function nextQuestion() {
-    document.querySelectorAll('.option-btn').forEach(btn => {
-        btn.classList.remove('active', 'correct-answer');
+    document.querySelectorAll('.text-input').forEach(input => {
+        input.value = '';
+        input.classList.remove('correct-answer', 'wrong-answer');
     });
+    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active', 'correct-answer'));
 
     document.getElementById('AnswerBlock').classList.add('hidden');
 
@@ -79,7 +81,11 @@ function renderQuestion(question) {
         <h3>Вопрос ${currentQuestionNumber}</h3>
         <div class="question-text">${question.text}</div>
         ${question.type === 'text' ?
-        `<input type="text" class="text-input" maxlength="4">` :
+        `<div class="text-inputs-container">
+            ${Array.from({ length: 4 }, (_, i) => `
+            <input type="text" class="text-input" maxlength="1" data-index="${i}">
+        `).join('')}       
+        </div>` :
         `<div class="options-table">${question.options.map(o => `
                 <div class="option-btn">${o}</div>
             `).join('')}</div>`
@@ -87,6 +93,26 @@ function renderQuestion(question) {
         <button class="btn btn-info confirm-btn" onclick="submitAnswer()">Подтвердить ответ</button>
     `;
 
+    if (question.type === 'text') {
+        const inputs = document.querySelectorAll('.text-input');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value) {
+                    if (index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                }
+            });
+        });
+    }
 
     if (question.type === 'multiple') {
         document.querySelectorAll('.option-btn').forEach(btn =>
@@ -100,9 +126,15 @@ function renderQuestion(question) {
 function submitAnswer() {
     const answerBlock = document.getElementById('AnswerBlock');
     const questionBlock = document.getElementById('QuestionBlock');
-    const answer = document.querySelector('.option-btn.active')?.innerText ||
-        document.querySelector('.text-input')?.value;
+    const inputs = document.querySelectorAll('.text-input');
+    const selectedOption = document.querySelector('.option-btn.active');
+    let answer;
 
+    if (inputs.length > 0) {
+        answer = Array.from(inputs).map(input => input.value.trim()).join('').toUpperCase();
+    } else if (selectedOption) {
+        answer = selectedOption.innerText;
+    }
 
     SendRequest({
         method: 'POST',
@@ -112,6 +144,14 @@ function submitAnswer() {
         },
         success(data) {
             const result = JSON.parse(data.responseText);
+            const isCorrect = answer === result.answer.toUpperCase();
+
+            if (inputs.length > 0) {
+                inputs.forEach(input => {
+                    input.classList.remove('correct-answer', 'wrong-answer');
+                    input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+                });
+            }
 
             document.querySelectorAll('.option-btn').forEach(btn => {
                 if (btn.innerText === result.answer) {
