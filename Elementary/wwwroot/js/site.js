@@ -1,5 +1,5 @@
-﻿
-var currentPage = 1
+﻿var currentPage = 1;
+
 function init() {
     refreshPage();
 }
@@ -10,9 +10,7 @@ function changePage(page) {
 }
 
 function refreshPage() {
-    document.querySelectorAll(".game-page").forEach(element => {
-        element.classList.add('hidden');
-    });
+    document.querySelectorAll(".game-page").forEach(element => element.classList.add('hidden'));
 
     document.getElementById('page-' + currentPage).classList.remove('hidden');
 }
@@ -21,9 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     init();
 });
 
-game = {
-
-}
+game = {};
 
 function setMode(val) {
     game.mode = val;
@@ -73,25 +69,22 @@ function getQuestion() {
                 for (let i = 0; i < question.options.length; i++) {
                     text += "<div class='option-btn'>" + question.options[i] + "</div>"
                 }
-                text + "</div>"
+                text + "</div>";
 
                 optionsDiv.innerHTML = text;
                 block.appendChild(optionsDiv);
 
-                document.querySelectorAll(".option-btn").forEach(element => {
+                document.querySelectorAll(".option-btn").forEach(element =>
                     element.addEventListener('click', function (event) {
-                        document.querySelectorAll(".option-btn").forEach(element => {
-                            element.classList.remove('active');
-                        });
+                        document.querySelectorAll(".option-btn").forEach(element => element.classList.remove('active'));
 
                         event.target.classList.add('active');
-                    });
-                });
+                    }));
             }
 
             const confirmButton = document.createElement('button');
-            confirmButton.classList.add('confirm-btn','btn','btn-info');
-            confirmButton.innerHTML = "подтвердить ответ"
+            confirmButton.classList.add('confirm-btn', 'btn', 'btn-info');
+            confirmButton.innerHTML = "подтвердить ответ";
             confirmButton.addEventListener('click', function (event) {
                 let activeBtns = document.querySelectorAll('#QuestionBlock .option-btn.active');
                 if (activeBtns.length > 0) {
@@ -126,7 +119,7 @@ function sendAnswer(answer) {
 
             const explanationDiv = document.createElement('div');
             explanationDiv.classList.add('explanation');
-            explanationDiv.innerHTML = answer.explanation
+            explanationDiv.innerHTML = answer.explanation;
 
             block = document.getElementById('QuestionBlock');
             block.appendChild(explanationDiv);
@@ -141,14 +134,14 @@ var currentAngle = 0;
 function ruletkaStart() {
     const sectorValue = getRandomInt(1, 12);
     // 360 градусов это 12 сектаров, значит 1 сектор это 360 / 12 = 30 градусов
-    const sector = 30
+    const sector = 30;
 
     ruletkaDiv = document.getElementById('ruletka');
 
     var rounds = getRandomInt(2, 5);
     const time = getRandomInt(3, 8);
     angle = rounds * 360 + sectorValue * sector;
-    currentAngle += angle
+    currentAngle += angle;
     ruletkaDiv.style.transition = `transform ${time}s cubic-bezier(0.1, 0.7, 0.1, 1)`;
     ruletkaDiv.style.transform = `rotate(${currentAngle}deg)`;
 }
@@ -161,7 +154,7 @@ function SendRequest(options) {
     let _this = {};
     let defaultOptions = {
         method: 'POST',
-    }
+    };
 
     _this.options = Object.assign({}, defaultOptions, options);
 
@@ -191,11 +184,12 @@ function SendRequest(options) {
             }
         };
         xhr.send(JSON.stringify(_this.options.body));
-    }
+    };
     _this.Send();
 }
 
 var globalAlertId = 0;
+
 function showAlert(title, message, timeoutSeconds) {
     globalAlertId++;
     let alertId = globalAlertId;

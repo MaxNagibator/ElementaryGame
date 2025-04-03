@@ -1,107 +1,103 @@
-using System.Diagnostics;
+using Elementary.Business;
 using Elementary.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
-namespace Elementary.Controllers
+namespace Elementary.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    public static Game GameValue = new();
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(ILogger<HomeController> logger)
     {
-        private readonly ILogger<HomeController> _logger;
+        _logger = logger;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public JsonResult StartGame()
+    {
+        GameValue.StartGame();
+        return new(new { Text = "Vrum Wrum" });
+    }
+
+    [HttpPost]
+    public JsonResult GetNextQuestion()
+    {
+        var question = GameValue.GetNextQuestion();
+
+        return new(new
         {
-            _logger = logger;
-        }
+            Text = question.Value,
+            question.Options,
+        });
+    }
 
-        public IActionResult Index()
+    [HttpPost]
+    public JsonResult SetAnswer([FromBody] SetAnswerModel model)
+    {
+        var isCorrect = GameValue.SetAnswer(model.Value);
+        var currentQuestion = GameValue.GetCurrentQuestion();
+
+        return new(new
         {
-            return View();
-        }
+            IsCorrect = isCorrect,
+            currentQuestion.Answer,
+            currentQuestion.Explanation,
+        });
+    }
 
-        [HttpPost]
-        public JsonResult StartGame()
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+}
+
+public class SetAnswerModel
+{
+    public string Value { get; set; }
+}
+
+public class Game
+{
+    public int CurrentQuestionId = -1;
+
+    public List<Question> Questions = QuestionHolder.GetQuestions();
+    public List<UserAnswer> Answers = [];
+
+    public Question GetNextQuestion()
+    {
+        CurrentQuestionId++;
+        return Questions[CurrentQuestionId];
+    }
+
+    public Question GetCurrentQuestion()
+    {
+        return Questions[CurrentQuestionId];
+    }
+
+    public void StartGame()
+    {
+        CurrentQuestionId = -1;
+        Answers = [];
+    }
+
+    public bool SetAnswer(string value)
+    {
+        var answer = new UserAnswer
         {
-            GameValue.StartGame();
-            return new JsonResult(new { Text = "Vrum Wrum" });
-        }
+            IsCorrect = string.Equals(Questions[CurrentQuestionId].Answer, value, StringComparison.InvariantCultureIgnoreCase),
+            Value = value,
+        };
 
-        [HttpPost]
-        public JsonResult GetNextQuestion()
-        {
-            var question = GameValue.GetNextQuestion();
-
-            return new JsonResult(new
-            {
-                Text = question.Value,
-                Options = question.Options,
-            });
-        }
-
-        public class SetAnswerModel
-        {
-            public string Value { get; set; }
-        }
-
-        [HttpPost]
-        public JsonResult SetAnswer([FromBody] SetAnswerModel model)
-        {
-            bool isCorrect = GameValue.SetAnswer(model.Value);
-            var currentQuestion = GameValue.GetCurrentQuestion();
-            return new JsonResult(new
-            {
-                IsCorrect = isCorrect,
-                Answer = currentQuestion.Answer,
-                Explanation = currentQuestion.Explanation,
-            });
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        public class Game()
-        {
-            public int CurrentQuestionId = -1;
-
-            public List<Question> Questions = QuestionHolder.GetQuestions();
-            public List<UserAnswer> Answers = new List<UserAnswer>();
-
-            public Question GetNextQuestion()
-            {
-                CurrentQuestionId++;
-                return Questions[CurrentQuestionId];
-            }
-
-            public Question GetCurrentQuestion()
-            {
-                return Questions[CurrentQuestionId];
-            }
-
-            public void StartGame()
-            {
-                CurrentQuestionId = -1;
-                Answers = new List<UserAnswer>();
-            }
-
-            internal bool SetAnswer(string value)
-            {
-                var answer = new UserAnswer
-                {
-                    IsCorrect = string.Equals(Questions[CurrentQuestionId].Answer, value, StringComparison.InvariantCultureIgnoreCase),
-                    Value = value,
-                };
-                Answers.Add(answer);
-                return answer.IsCorrect;
-            }
-        }
-
-        public static Game GameValue = new Game();
+        Answers.Add(answer);
+        return answer.IsCorrect;
     }
 }

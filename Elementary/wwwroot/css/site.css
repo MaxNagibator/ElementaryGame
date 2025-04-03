@@ -1,26 +1,25 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
-
 
 .animation {
     /* transform: rotate(360deg);*/
@@ -37,15 +36,15 @@ body {
 }
 
 #QuestionBlock {
-    border: 1px solid;
-    border-radius: 10px;
     margin: 5px;
     padding: 10px;
+    border: 1px solid;
+    border-radius: 10px;
 }
 
     #QuestionBlock .options-table {
-        width: 100%;
         display: grid;
+        width: 100%;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto;
         gap: 10px;
@@ -57,33 +56,33 @@ body {
         }
 
     #QuestionBlock .option-btn {
-        border: 1px solid;
-        border-radius: 10px;
-        min-height: 60px;
-        text-align: center;
-        padding: 15px;
-        background: #f0f0f0;
-        border: 1px solid #ddd;
         display: flex;
         align-items: center;
         justify-content: center;
+        min-height: 60px;
+        padding: 15px;
+        text-align: center;
+        border: 1px solid;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #f0f0f0;
     }
 
         #QuestionBlock .option-btn.active {
-            background-color: darkorange;
             color: white;
+            background-color: darkorange;
         }
 
         #QuestionBlock .option-btn.right-answer {
-            background-color: darkgreen;
             color: white;
+            background-color: darkgreen;
         }
 
     #QuestionBlock .confirm-btn {
         font-size: 20px;
-        margin-top: 20px;
-        min-height: 60px;
         width: 100%;
+        min-height: 60px;
+        margin-top: 20px;
         border-radius: 10px;
     }
 
@@ -92,17 +91,17 @@ body {
         margin-top: 20px;
     }
 
-    .alerts-body {
-        position: fixed;
-        top: 180px;
-        z-index: 999992;
-        width: 415px;
-        right: 0;
-        padding-right: 15px;
-    }
+.alerts-body {
+    position: fixed;
+    z-index: 999992;
+    top: 180px;
+    right: 0;
+    width: 415px;
+    padding-right: 15px;
+}
 
 .alert .close {
     position: absolute;
-    right: 10px;
     top: 10px;
+    right: 10px;
 }
