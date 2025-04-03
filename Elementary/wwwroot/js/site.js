@@ -1,4 +1,5 @@
-﻿var currentPage = 1;
+﻿let currentPage = 1;
+let currentQuestionNumber = 1;
 
 function init() {
     refreshPage();
@@ -11,13 +12,8 @@ function changePage(page) {
 
 function refreshPage() {
     document.querySelectorAll(".game-page").forEach(element => element.classList.add('hidden'));
-
     document.getElementById('page-' + currentPage).classList.remove('hidden');
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-    init();
-});
 
 game = {};
 
@@ -28,11 +24,12 @@ function setMode(val) {
 
 function setSkin(val) {
     changePage(3);
+    startGame();
 }
 
 function setLevel(val) {
     game.level = val;
-    changePage(4);
+    loadQuestion();
 }
 
 function startGame() {
@@ -43,62 +40,70 @@ function startGame() {
             playerSecret: "test"
         },
         success(data) {
+            currentQuestionNumber = 1;
+            loadQuestion();
         }
     });
 }
 
-function getQuestion() {
+function nextQuestion() {
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.classList.remove('active', 'correct-answer');
+    });
+
+    document.getElementById('AnswerBlock').classList.add('hidden');
+
+    currentQuestionNumber++;
+    loadQuestion();
+}
+
+function loadQuestion() {
     SendRequest({
         method: 'POST',
         url: '/Home/GetNextQuestion',
         body: {
-            playerSecret: "test"
+            questionNumber: currentQuestionNumber,
+            level: game.level
         },
         success(data) {
-            let question = JSON.parse(data.responseText);
-            block = document.getElementById('QuestionBlock');
-            block.innerHTML = "";
-
-            const textDiv = document.createElement('div');
-            textDiv.innerHTML = question.text;
-            block.appendChild(textDiv);
-
-            if (question.options) {
-                const optionsDiv = document.createElement('div');
-                let text = "<div class='options-table'>";
-                for (let i = 0; i < question.options.length; i++) {
-                    text += "<div class='option-btn'>" + question.options[i] + "</div>"
-                }
-                text + "</div>";
-
-                optionsDiv.innerHTML = text;
-                block.appendChild(optionsDiv);
-
-                document.querySelectorAll(".option-btn").forEach(element =>
-                    element.addEventListener('click', function (event) {
-                        document.querySelectorAll(".option-btn").forEach(element => element.classList.remove('active'));
-
-                        event.target.classList.add('active');
-                    }));
-            }
-
-            const confirmButton = document.createElement('button');
-            confirmButton.classList.add('confirm-btn', 'btn', 'btn-info');
-            confirmButton.innerHTML = "подтвердить ответ";
-            confirmButton.addEventListener('click', function (event) {
-                let activeBtns = document.querySelectorAll('#QuestionBlock .option-btn.active');
-                if (activeBtns.length > 0) {
-                    answer = activeBtns[0].innerHTML;
-                    sendAnswer(answer);
-                }
-            });
-            block.appendChild(confirmButton);
-
+            const question = JSON.parse(data.responseText);
+            renderQuestion(question);
+            changePage(4);
         }
     });
 }
 
-function sendAnswer(answer) {
+function renderQuestion(question) {
+    const block = document.getElementById('QuestionBlock');
+    block.innerHTML = `
+        <h3>Вопрос ${currentQuestionNumber}</h3>
+        <div class="question-text">${question.text}</div>
+        ${question.type === 'text' ?
+        `<input type="text" class="text-input" maxlength="4">` :
+        `<div class="options-table">${question.options.map(o => `
+                <div class="option-btn">${o}</div>
+            `).join('')}</div>`
+    }
+        <button class="btn btn-info confirm-btn" onclick="submitAnswer()">Подтвердить ответ</button>
+    `;
+
+
+    if (question.type === 'multiple') {
+        document.querySelectorAll('.option-btn').forEach(btn =>
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            }));
+    }
+}
+
+function submitAnswer() {
+    const answerBlock = document.getElementById('AnswerBlock');
+    const questionBlock = document.getElementById('QuestionBlock');
+    const answer = document.querySelector('.option-btn.active')?.innerText ||
+        document.querySelector('.text-input')?.value;
+
+
     SendRequest({
         method: 'POST',
         url: '/Home/SetAnswer',
@@ -106,32 +111,28 @@ function sendAnswer(answer) {
             value: answer
         },
         success(data) {
-            let answer = JSON.parse(data.responseText);
-            let btns = document.querySelectorAll('#QuestionBlock .option-btn');
-            for (let i = 0; i < btns.length; i++) {
-                if (btns[i].innerHTML == answer.answer) {
-                    btns[i].classList.add('right-answer')
+            const result = JSON.parse(data.responseText);
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                if (btn.innerText === result.answer) {
+                    btn.classList.add('correct-answer');
                 }
-            }
+            });
 
-            let confirmBtn = document.querySelectorAll('#QuestionBlock .confirm-btn');
-            confirmBtn[0].remove();
+            document.getElementById('Explanation').innerHTML = result.explanation;
 
-            const explanationDiv = document.createElement('div');
-            explanationDiv.classList.add('explanation');
-            explanationDiv.innerHTML = answer.explanation;
-
-            block = document.getElementById('QuestionBlock');
-            block.appendChild(explanationDiv);
-
+            questionBlock.querySelector('.confirm-btn').classList.add('hidden');
+            answerBlock.classList.remove('hidden');
         }
     });
 }
 
+document.addEventListener('DOMContentLoaded', init);
+
 
 var currentAngle = 0;
 
-function ruletkaStart() {
+function spinWheel() {
     const sectorValue = getRandomInt(1, 12);
     // 360 градусов это 12 сектаров, значит 1 сектор это 360 / 12 = 30 градусов
     const sector = 30;

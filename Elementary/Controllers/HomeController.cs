@@ -32,10 +32,14 @@ public class HomeController : Controller
     {
         var question = GameValue.GetNextQuestion();
 
+        var options = question.Options.ToArray();
+        Random.Shared.Shuffle(options);
+
         return new(new
         {
             Text = question.Value,
-            question.Options,
+            Options = options,
+            Type = question.Options.Count > 0 ? "multiple" : "text",
         });
     }
 

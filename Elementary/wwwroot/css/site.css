@@ -42,54 +42,54 @@ body {
     border-radius: 10px;
 }
 
-    #QuestionBlock .options-table {
-        display: grid;
-        width: 100%;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto auto;
-        gap: 10px;
-    }
+#QuestionBlock .options-table {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+}
 
-        #QuestionBlock .options-table td {
-            padding: 5px;
-            border: 1px
-        }
+#QuestionBlock .options-table td {
+    padding: 5px;
+    border: 1px
+}
 
-    #QuestionBlock .option-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 60px;
-        padding: 15px;
-        text-align: center;
-        border: 1px solid;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background: #f0f0f0;
-    }
+#QuestionBlock .option-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f0f0f0;
+}
 
-        #QuestionBlock .option-btn.active {
-            color: white;
-            background-color: darkorange;
-        }
+#QuestionBlock .option-btn.active {
+    color: white;
+    background-color: #ffa500;
+}
 
-        #QuestionBlock .option-btn.right-answer {
-            color: white;
-            background-color: darkgreen;
-        }
+#QuestionBlock .option-btn.correct-answer {
+    color: white;
+    border: 2px solid #1e7e34;
+    background-color: #28a745;
+}
 
-    #QuestionBlock .confirm-btn {
-        font-size: 20px;
-        width: 100%;
-        min-height: 60px;
-        margin-top: 20px;
-        border-radius: 10px;
-    }
+#QuestionBlock .confirm-btn {
+    font-size: 20px;
+    width: 100%;
+    min-height: 60px;
+    margin-top: 20px;
+    border-radius: 10px;
+}
 
-    #QuestionBlock .explanation {
-        width: 100%;
-        margin-top: 20px;
-    }
+#QuestionBlock .explanation {
+    width: 100%;
+    margin-top: 20px;
+}
 
 .alerts-body {
     position: fixed;
@@ -104,4 +104,49 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+@media (max-width: 768px) {
+    .game-page {
+        padding: 10px;
+    }
+
+    .options-table {
+        grid-template-columns: 1fr !important;
+    }
+
+    .option-btn {
+        font-size: 14px;
+        min-height: 50px;
+    }
+
+    .question-container, .answer-container {
+        margin: 5px 0;
+        padding: 10px;
+    }
+}
+
+.question-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.answer-container {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.text-input {
+    font-size: 16px;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
