@@ -49,11 +49,16 @@ function startGame() {
 function nextQuestion() {
     document.querySelectorAll('.text-input').forEach(input => {
         input.value = '';
+        input.removeAttribute('readonly');
         input.classList.remove('correct-answer', 'wrong-answer');
     });
-    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active', 'correct-answer'));
+
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.classList.remove('active', 'correct-answer', 'disabled');
+    });
 
     document.getElementById('AnswerBlock').classList.add('hidden');
+    document.querySelector('.confirm-btn').classList.remove('disabled');
 
     currentQuestionNumber++;
     loadQuestion();
@@ -117,8 +122,10 @@ function renderQuestion(question) {
     if (question.type === 'multiple') {
         document.querySelectorAll('.option-btn').forEach(btn =>
             btn.addEventListener('click', function () {
-                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
+                if (!this.classList.contains('disabled')) {
+                    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                }
             }));
     }
 }
@@ -130,10 +137,16 @@ function submitAnswer() {
     const selectedOption = document.querySelector('.option-btn.active');
     let answer;
 
+    document.querySelector('.confirm-btn').classList.add('disabled');
+
     if (inputs.length > 0) {
         answer = Array.from(inputs).map(input => input.value.trim()).join('').toUpperCase();
+        inputs.forEach(input => input.setAttribute('readonly', true));
     } else if (selectedOption) {
         answer = selectedOption.innerText;
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.add('disabled');
+        });
     }
 
     SendRequest({
@@ -148,20 +161,17 @@ function submitAnswer() {
 
             if (inputs.length > 0) {
                 inputs.forEach(input => {
-                    input.classList.remove('correct-answer', 'wrong-answer');
                     input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+                });
+            } else {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.innerText === result.answer) {
+                        btn.classList.add('correct-answer');
+                    }
                 });
             }
 
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                if (btn.innerText === result.answer) {
-                    btn.classList.add('correct-answer');
-                }
-            });
-
             document.getElementById('Explanation').innerHTML = result.explanation;
-
-            questionBlock.querySelector('.confirm-btn').classList.add('hidden');
             answerBlock.classList.remove('hidden');
         }
     });
