@@ -185,9 +185,11 @@ function submitAnswer() {
                 });
             }
 
-            confirmBtn.textContent = 'Следующий вопрос';
-            confirmBtn.onclick = nextQuestion;
-            confirmBtn.disabled = false;
+            setTimeout(() => {
+                confirmBtn.textContent = 'Следующий вопрос';
+                confirmBtn.onclick = nextQuestion;
+                confirmBtn.disabled = false;
+            }, 500);
         }
     });
 }
