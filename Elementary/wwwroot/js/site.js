@@ -13,6 +13,12 @@ function changePage(page) {
 function refreshPage() {
     document.querySelectorAll(".game-page").forEach(element => element.classList.add('hidden'));
     document.getElementById('page-' + currentPage).classList.remove('hidden');
+
+    if (currentPage === 1) {
+        document.body.classList.add('page-1-background');
+    } else {
+        document.body.classList.remove('page-1-background');
+    }
 }
 
 game = {};

@@ -1,11 +1,56 @@
+@font-face {
+    font-family: "Gordita";
+    src: url("/fonts/Gordita-Regular.woff2") format("woff2"),
+    url("/fonts/Gordita-Regular.woff") format("woff"),
+    url("/fonts/Gordita-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Gordita";
+    src: url("/fonts/Gordita-Bold.woff2") format("woff2"),
+    url("/fonts/Gordita-Bold.woff") format("woff");
+    font-weight: bold;
+    font-style: normal;
+}
+
 html {
     font-size: 14px;
+    line-height: 1.1;
 }
 
 @media (min-width: 768px) {
     html {
         font-size: 16px;
     }
+}
+
+body {
+    font-family: "Gordita", sans-serif;
+    background-image: url("/images/background.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+h1, h2, h3 {
+    font-family: "Gordita", sans-serif;
+    font-weight: bold;
+}
+
+body.page-1-background {
+    background-image: url("/images/page-1-background.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+body.question-3-background {
+    background-image: url("/images/question-3-background.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -36,10 +81,12 @@ body {
 }
 
 #QuestionBlock {
+    font-size: 16px;
     margin: 5px;
     padding: 10px;
     border: 1px solid;
     border-radius: 10px;
+    background-color: white;
 }
 
 #QuestionBlock .options-table {
@@ -134,8 +181,9 @@ body {
 }
 
 #QuestionBlock .option-btn.disabled {
+    min-height: 0;
     pointer-events: none;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 #QuestionBlock .text-input[readonly] {
@@ -163,10 +211,6 @@ body {
 }
 
 @media (max-width: 768px) {
-    .game-page {
-        padding: 10px;
-    }
-
     .options-table {
         grid-template-columns: 1fr !important;
     }
@@ -191,11 +235,20 @@ body {
 }
 
 .answer-container {
-    margin-top: 20px;
+    font-size: 16px;
+    display: block;
+    margin: 20px 5px 5px;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.answer-container button {
+    width: 100%;
+    min-height: 60px;
     padding: 15px;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    background-color: #f8f9fa;
+    border-radius: 10px;
 }
 
 .text-input {
