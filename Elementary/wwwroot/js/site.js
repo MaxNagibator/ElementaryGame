@@ -53,18 +53,19 @@ function startGame() {
 }
 
 function nextQuestion() {
+    const confirmBtn = document.querySelector('.confirm-btn');
+    if (confirmBtn) {
+        confirmBtn.remove();
+    }
+
     document.querySelectorAll('.text-input').forEach(input => {
         input.value = '';
         input.removeAttribute('readonly');
         input.classList.remove('correct-answer', 'wrong-answer');
     });
 
-    document.querySelectorAll('.option-btn').forEach(btn => {
-        btn.classList.remove('active', 'correct-answer', 'disabled');
-    });
-
-    document.getElementById('AnswerBlock').classList.add('hidden');
-    document.querySelector('.confirm-btn').classList.remove('disabled');
+    document.querySelectorAll('.option-btn')
+        .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
 
     currentQuestionNumber++;
     loadQuestion();
@@ -101,21 +102,32 @@ function renderQuestion(question) {
                 <div class="option-btn">${o}</div>
             `).join('')}</div>`
     }
-        <button class="btn btn-info confirm-btn" onclick="submitAnswer()">Подтвердить ответ</button>
     `;
 
+    const answerContainer = document.getElementById('AnswerBlock');
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'btn btn-info confirm-btn';
+    confirmBtn.textContent = 'Подтвердить ответ';
+    confirmBtn.disabled = true;
+    confirmBtn.onclick = submitAnswer;
+    answerContainer.appendChild(confirmBtn);
+
+    const inputs = document.querySelectorAll('.text-input');
+    const optionBtns = document.querySelectorAll('.option-btn');
+
     if (question.type === 'text') {
-        const inputs = document.querySelectorAll('.text-input');
         inputs.forEach((input, index) => {
-            input.addEventListener('input', (e) => {
+            input.addEventListener('input', e => {
                 if (e.target.value.length === 1) {
                     if (index < inputs.length - 1) {
                         inputs[index + 1].focus();
                     }
                 }
+                const allFilled = Array.from(inputs).every(i => i.value.trim() !== '');
+                confirmBtn.disabled = !allFilled;
             });
 
-            input.addEventListener('keydown', (e) => {
+            input.addEventListener('keydown', e => {
                 if (e.key === 'Backspace' && !e.target.value) {
                     if (index > 0) {
                         inputs[index - 1].focus();
@@ -123,36 +135,34 @@ function renderQuestion(question) {
                 }
             });
         });
-    }
-
-    if (question.type === 'multiple') {
-        document.querySelectorAll('.option-btn').forEach(btn =>
+    } else if (question.type === 'multiple') {
+        optionBtns.forEach(btn =>
             btn.addEventListener('click', function () {
                 if (!this.classList.contains('disabled')) {
                     document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                 }
+                confirmBtn.disabled = false;
             }));
     }
 }
 
+
 function submitAnswer() {
-    const answerBlock = document.getElementById('AnswerBlock');
-    const questionBlock = document.getElementById('QuestionBlock');
     const inputs = document.querySelectorAll('.text-input');
     const selectedOption = document.querySelector('.option-btn.active');
-    let answer;
+    const confirmBtn = document.querySelector('.confirm-btn');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Ответ принят';
 
-    document.querySelector('.confirm-btn').classList.add('disabled');
+    let answer;
 
     if (inputs.length > 0) {
         answer = Array.from(inputs).map(input => input.value.trim()).join('').toUpperCase();
         inputs.forEach(input => input.setAttribute('readonly', true));
     } else if (selectedOption) {
         answer = selectedOption.innerText;
-        document.querySelectorAll('.option-btn').forEach(btn => {
-            btn.classList.add('disabled');
-        });
+        document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
     }
 
     SendRequest({
@@ -166,9 +176,7 @@ function submitAnswer() {
             const isCorrect = answer === result.answer.toUpperCase();
 
             if (inputs.length > 0) {
-                inputs.forEach(input => {
-                    input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
-                });
+                inputs.forEach(input => input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer'));
             } else {
                 document.querySelectorAll('.option-btn').forEach(btn => {
                     if (btn.innerText === result.answer) {
@@ -177,8 +185,9 @@ function submitAnswer() {
                 });
             }
 
-            document.getElementById('Explanation').innerHTML = result.explanation;
-            answerBlock.classList.remove('hidden');
+            confirmBtn.textContent = 'Следующий вопрос';
+            confirmBtn.onclick = nextQuestion;
+            confirmBtn.disabled = false;
         }
     });
 }
