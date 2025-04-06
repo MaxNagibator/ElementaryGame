@@ -54,7 +54,6 @@ public class HomeController : Controller
             IsCorrect = isCorrect,
             currentQuestion.Answer,
             currentQuestion.Explanation,
-            ImageUrl = $"/images/explanations/q{GameValue.CurrentQuestionId + 1}.png",
         });
     }
 

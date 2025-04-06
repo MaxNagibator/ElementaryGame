@@ -47,7 +47,6 @@ function startGame() {
         },
         success(data) {
             currentQuestionNumber = 1;
-            loadQuestion();
         }
     });
 }
@@ -194,7 +193,7 @@ function submitAnswer() {
                 explanationContainer.classList.add('visible');
 
                 const explanationImage = document.createElement('img');
-                explanationImage.src = result.imageUrl;
+                explanationImage.src = `/images/explanations/q${currentQuestionNumber}.png`;
                 explanationImage.className = 'explanation-image';
                 explanationContainer.appendChild(explanationImage);
 
