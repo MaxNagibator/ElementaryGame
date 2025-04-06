@@ -2,34 +2,78 @@
     ViewData["Title"] = "Home Page";
 }
 
-<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/site.js"
+        asp-append-version="true"></script>
 
-<div class="text-center">
-    <h1 class="display-4">Элементарно! (или не совсем)</h1>
+<div class="text-center"
+     style="display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 120px;
+">
+    @*<h1 class="display-4">Элементарно! (или не совсем)</h1>
     <div>
-        <label>Периодический закон и периодическая система Д. И. Менделеева. Электронный период в развитии химии.</label>
+        <label>
+            Периодический закон и периодическая система Д. И. Менделеева. Электронный период в развитии химии.
+        </label>
+    </div>*@
+
+    <div>
+        DEBUG:
+        <button class="btn btn-info"
+                onclick="setSkin(1)">выбрать скин
+        </button>
+        <button class="btn btn-success"
+                onclick="startGame()">начинаем
+        </button>
     </div>
 
-    <button class="btn btn-success" onclick="startGame()">начинаем</button>
+    <div id="page-1"
+         class="game-page">
+        <h2>Выбор режима</h2>
+        <button class="btn btn-info"
+                onclick="setMode(1)">Одиночный
+        </button>
+        <button class="btn btn-info"
+                onclick="setMode(2)">Командный
+        </button>
+    </div>
 
-    <div id="page-1" class="game-page">
-        <button class="btn btn-info" onclick="setMode(1)">Одиночный</button>
-        <button class="btn btn-info" onclick="setMode(2)">Командный</button>
-        <button class="btn btn-info" onclick="getQuestion()">поехали</button>
-        <div id="QuestionBlock">
+    <div id="page-2"
+         class="game-page hidden">
+        <h2>Колесо фортуны</h2>
+        <img id="ruletka"
+             src="~/images/ruletka.png"
+             style="width: 250px;" />
+        <button class="btn btn-success"
+                onclick="spinWheel()">Крутить колесо
+        </button>
+    </div>
+
+    <div id="page-3"
+         class="game-page hidden">
+        <h2>Выбор уровня</h2>
+        <button class="btn btn-info"
+                onclick="setLevel(1)">Начальный
+        </button>
+        <button class="btn btn-info"
+                onclick="setLevel(2)">Продвинутый
+        </button>
+    </div>
+
+    <div id="page-4"
+         class="game-page hidden">
+        <div id="QuestionBlock"
+             class="question-container">
         </div>
-    </div>
-    <div id="page-2" class="game-page">
-        <button class="btn btn-info" onclick="setSkin(1)">выбрать скин</button>
-        <button class="btn btn-success" style="display:block;" onclick="ruletkaStart()">123123</button>
-        <div>pimpa</div>
-        <img id="ruletka" src="~/images/ruletka.png" style="width: 250px;" />
-    </div>
-    <div id="page-3" class="game-page">
-        <button class="btn btn-info" onclick="setLevel(1)">Начальный</button>
-        <button class="btn btn-info" onclick="setLevel(2)">Продвинутый</button>
-    </div>
-    <div id="page-4" class="game-page">
-        <button class="btn btn-info" onclick="getQuestion()">поехали</button>
+        <div id="Explanation"
+             class="explanation-container">
+        </div>
+        <div id="AnswerBlock"
+             class="answer-container hidden">
+        </div>
     </div>
 </div>

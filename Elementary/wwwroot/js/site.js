@@ -1,5 +1,6 @@
-﻿
-var currentPage = 1
+﻿let currentPage = 1;
+let currentQuestionNumber = 1;
+
 function init() {
     refreshPage();
 }
@@ -10,20 +11,17 @@ function changePage(page) {
 }
 
 function refreshPage() {
-    document.querySelectorAll(".game-page").forEach(element => {
-        element.classList.add('hidden');
-    });
-
+    document.querySelectorAll(".game-page").forEach(element => element.classList.add('hidden'));
     document.getElementById('page-' + currentPage).classList.remove('hidden');
+
+    if (currentPage === 1) {
+        document.body.classList.add('page-1-background');
+    } else {
+        document.body.classList.remove('page-1-background');
+    }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    init();
-});
-
-game = {
-
-}
+game = {};
 
 function setMode(val) {
     game.mode = val;
@@ -32,11 +30,12 @@ function setMode(val) {
 
 function setSkin(val) {
     changePage(3);
+    startGame();
 }
 
 function setLevel(val) {
     game.level = val;
-    changePage(4);
+    loadQuestion();
 }
 
 function startGame() {
@@ -47,65 +46,128 @@ function startGame() {
             playerSecret: "test"
         },
         success(data) {
+            currentQuestionNumber = 1;
         }
     });
 }
 
-function getQuestion() {
+function nextQuestion() {
+    const confirmBtn = document.querySelector('.confirm-btn');
+    if (confirmBtn) {
+        confirmBtn.remove();
+    }
+
+    const explanationContainer = document.getElementById('Explanation');
+    explanationContainer.classList.remove('visible');
+    explanationContainer.innerHTML = '';
+
+    document.querySelectorAll('.text-input').forEach(input => {
+        input.value = '';
+        input.removeAttribute('readonly');
+        input.classList.remove('correct-answer', 'wrong-answer');
+    });
+
+    document.querySelectorAll('.option-btn')
+        .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
+
+    currentQuestionNumber++;
+    loadQuestion();
+}
+
+function loadQuestion() {
     SendRequest({
         method: 'POST',
         url: '/Home/GetNextQuestion',
         body: {
-            playerSecret: "test"
+            questionNumber: currentQuestionNumber,
+            level: game.level
         },
         success(data) {
-            let question = JSON.parse(data.responseText);
-            block = document.getElementById('QuestionBlock');
-            block.innerHTML = "";
-
-            const textDiv = document.createElement('div');
-            textDiv.innerHTML = question.text;
-            block.appendChild(textDiv);
-
-            if (question.options) {
-                const optionsDiv = document.createElement('div');
-                let text = "<div class='options-table'>";
-                for (let i = 0; i < question.options.length; i++) {
-                    text += "<div class='option-btn'>" + question.options[i] + "</div>"
-                }
-                text + "</div>"
-
-                optionsDiv.innerHTML = text;
-                block.appendChild(optionsDiv);
-
-                document.querySelectorAll(".option-btn").forEach(element => {
-                    element.addEventListener('click', function (event) {
-                        document.querySelectorAll(".option-btn").forEach(element => {
-                            element.classList.remove('active');
-                        });
-
-                        event.target.classList.add('active');
-                    });
-                });
-            }
-
-            const confirmButton = document.createElement('button');
-            confirmButton.classList.add('confirm-btn','btn','btn-info');
-            confirmButton.innerHTML = "подтвердить ответ"
-            confirmButton.addEventListener('click', function (event) {
-                let activeBtns = document.querySelectorAll('#QuestionBlock .option-btn.active');
-                if (activeBtns.length > 0) {
-                    answer = activeBtns[0].innerHTML;
-                    sendAnswer(answer);
-                }
-            });
-            block.appendChild(confirmButton);
-
+            const question = JSON.parse(data.responseText);
+            renderQuestion(question);
+            changePage(4);
         }
     });
 }
 
-function sendAnswer(answer) {
+function renderQuestion(question) {
+    const block = document.getElementById('QuestionBlock');
+    block.innerHTML = `
+        <h3>Вопрос ${currentQuestionNumber}</h3>
+        <div class="question-text">${question.text}</div>
+        ${question.type === 'text' ?
+        `<div class="text-inputs-container">
+            ${Array.from({ length: 4 }, (_, i) => `
+            <input type="text" class="text-input" maxlength="1" data-index="${i}">
+        `).join('')}
+        </div>` :
+        `<div class="options-table">${question.options.map(o => `
+                <div class="option-btn">${o}</div>
+            `).join('')}</div>`
+    }
+    `;
+
+    const answerContainer = document.getElementById('AnswerBlock');
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'btn btn-info confirm-btn';
+    confirmBtn.textContent = 'Подтвердить ответ';
+    confirmBtn.disabled = true;
+    confirmBtn.onclick = submitAnswer;
+    answerContainer.appendChild(confirmBtn);
+
+    const inputs = document.querySelectorAll('.text-input');
+    const optionBtns = document.querySelectorAll('.option-btn');
+
+    if (question.type === 'text') {
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', e => {
+                if (e.target.value.length === 1) {
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                }
+                const allFilled = Array.from(inputs).every(i => i.value.trim() !== '');
+                confirmBtn.disabled = !allFilled;
+            });
+
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !e.target.value) {
+                    if (index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                }
+            });
+        });
+    } else if (question.type === 'multiple') {
+        optionBtns.forEach(btn =>
+            btn.addEventListener('click', function () {
+                if (!this.classList.contains('disabled')) {
+                    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                }
+                confirmBtn.disabled = false;
+            }));
+    }
+}
+
+
+function submitAnswer() {
+    const inputs = document.querySelectorAll('.text-input');
+    const selectedOption = document.querySelector('.option-btn.active');
+    const confirmBtn = document.querySelector('.confirm-btn');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Ответ принят';
+
+    let answer;
+
+    if (inputs.length > 0) {
+        answer = Array.from(inputs).map(input => input.value.trim()).join('').toUpperCase();
+        inputs.forEach(input => input.setAttribute('readonly', true));
+    } else if (selectedOption) {
+        answer = selectedOption.innerText;
+        document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+    }
+
     SendRequest({
         method: 'POST',
         url: '/Home/SetAnswer',
@@ -113,42 +175,65 @@ function sendAnswer(answer) {
             value: answer
         },
         success(data) {
-            let answer = JSON.parse(data.responseText);
-            let btns = document.querySelectorAll('#QuestionBlock .option-btn');
-            for (let i = 0; i < btns.length; i++) {
-                if (btns[i].innerHTML == answer.answer) {
-                    btns[i].classList.add('right-answer')
-                }
+            const result = JSON.parse(data.responseText);
+            const isCorrect = answer === result.answer.toUpperCase();
+
+            if (inputs.length > 0) {
+                inputs.forEach(input => input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer'));
+            } else {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.innerText === result.answer) {
+                        btn.classList.add('correct-answer');
+                    }
+                });
             }
 
-            let confirmBtn = document.querySelectorAll('#QuestionBlock .confirm-btn');
-            confirmBtn[0].remove();
+            if (result.imageUrl) {
+                const explanationContainer = document.getElementById('Explanation');
+                explanationContainer.classList.add('visible');
 
-            const explanationDiv = document.createElement('div');
-            explanationDiv.classList.add('explanation');
-            explanationDiv.innerHTML = answer.explanation
+                const explanationImage = document.createElement('img');
+                explanationImage.src = `/images/explanations/q${currentQuestionNumber}.png`;
+                explanationImage.className = 'explanation-image';
+                explanationContainer.appendChild(explanationImage);
 
-            block = document.getElementById('QuestionBlock');
-            block.appendChild(explanationDiv);
+                setTimeout(() => {
+                    const rect = explanationContainer.getBoundingClientRect();
+                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                        explanationContainer.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                            inline: 'nearest'
+                        });
+                    }
+                }, 150);
+            }
 
+            setTimeout(() => {
+                confirmBtn.textContent = 'Следующий вопрос';
+                confirmBtn.onclick = nextQuestion;
+                confirmBtn.disabled = false;
+            }, 500);
         }
     });
 }
 
+document.addEventListener('DOMContentLoaded', init);
+
 
 var currentAngle = 0;
 
-function ruletkaStart() {
+function spinWheel() {
     const sectorValue = getRandomInt(1, 12);
     // 360 градусов это 12 сектаров, значит 1 сектор это 360 / 12 = 30 градусов
-    const sector = 30
+    const sector = 30;
 
     ruletkaDiv = document.getElementById('ruletka');
 
     var rounds = getRandomInt(2, 5);
     const time = getRandomInt(3, 8);
     angle = rounds * 360 + sectorValue * sector;
-    currentAngle += angle
+    currentAngle += angle;
     ruletkaDiv.style.transition = `transform ${time}s cubic-bezier(0.1, 0.7, 0.1, 1)`;
     ruletkaDiv.style.transform = `rotate(${currentAngle}deg)`;
 }
@@ -161,7 +246,7 @@ function SendRequest(options) {
     let _this = {};
     let defaultOptions = {
         method: 'POST',
-    }
+    };
 
     _this.options = Object.assign({}, defaultOptions, options);
 
@@ -191,11 +276,12 @@ function SendRequest(options) {
             }
         };
         xhr.send(JSON.stringify(_this.options.body));
-    }
+    };
     _this.Send();
 }
 
 var globalAlertId = 0;
+
 function showAlert(title, message, timeoutSeconds) {
     globalAlertId++;
     let alertId = globalAlertId;

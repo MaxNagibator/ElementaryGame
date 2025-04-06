@@ -1,4 +1,4 @@
-namespace Elementary.Controllers;
+namespace Elementary.Business;
 
 public class UserAnswer
 {
