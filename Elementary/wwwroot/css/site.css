@@ -192,6 +192,29 @@ body {
     border-radius: 10px;
 }
 
+.explanation-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    transition: all 0.4s ease-out;
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+.explanation-container.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.explanation-container .explanation-image {
+    max-width: 100%;
+    height: auto;
+    animation: fadeInZoom 0.5s ease-out;
+    border: 1px solid;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 @media (max-width: 768px) {
     .options-table {
         grid-template-columns: 1fr !important;
@@ -245,6 +268,17 @@ body {
     }
     100% {
         transform: translateX(0);
+    }
+}
+
+@keyframes fadeInZoom {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }
 

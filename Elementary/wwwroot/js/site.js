@@ -58,6 +58,10 @@ function nextQuestion() {
         confirmBtn.remove();
     }
 
+    const explanationContainer = document.getElementById('Explanation');
+    explanationContainer.classList.remove('visible');
+    explanationContainer.innerHTML = '';
+
     document.querySelectorAll('.text-input').forEach(input => {
         input.value = '';
         input.removeAttribute('readonly');
@@ -96,7 +100,7 @@ function renderQuestion(question) {
         `<div class="text-inputs-container">
             ${Array.from({ length: 4 }, (_, i) => `
             <input type="text" class="text-input" maxlength="1" data-index="${i}">
-        `).join('')}       
+        `).join('')}
         </div>` :
         `<div class="options-table">${question.options.map(o => `
                 <div class="option-btn">${o}</div>
@@ -183,6 +187,27 @@ function submitAnswer() {
                         btn.classList.add('correct-answer');
                     }
                 });
+            }
+
+            if (result.imageUrl) {
+                const explanationContainer = document.getElementById('Explanation');
+                explanationContainer.classList.add('visible');
+
+                const explanationImage = document.createElement('img');
+                explanationImage.src = result.imageUrl;
+                explanationImage.className = 'explanation-image';
+                explanationContainer.appendChild(explanationImage);
+
+                setTimeout(() => {
+                    const rect = explanationContainer.getBoundingClientRect();
+                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                        explanationContainer.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                            inline: 'nearest'
+                        });
+                    }
+                }, 150);
             }
 
             setTimeout(() => {
