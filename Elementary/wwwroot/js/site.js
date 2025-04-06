@@ -1,8 +1,28 @@
 ﻿let currentPage = 1;
 let currentQuestionNumber = 1;
+let idCookieName = 'my-id'
+let playerId;
 
 function init() {
     refreshPage();
+
+    let id = getCookie(idCookieName);
+    if (id == null) { 
+        id = uuidv4();
+        setCookie(idCookieName, id, 1);
+    }
+    playerId = id;
+
+    SendRequest({
+        method: 'POST',
+        url: '/Home/Join',
+        body: {
+            playerId: playerId
+        },
+        success(data) {
+
+        }
+    });
 }
 
 function changePage(page) {
@@ -220,11 +240,22 @@ function submitAnswer() {
 
 document.addEventListener('DOMContentLoaded', init);
 
-
 var currentAngle = 0;
-
 function spinWheel() {
-    const sectorValue = getRandomInt(1, 12);
+    SendRequest({
+        method: 'POST',
+        url: '/Home/SpinWhell',
+        body: {
+        },
+        success(data) {
+            const result = JSON.parse(data.responseText);
+            spinWheelAnimation(result.sectorValue);
+        }
+    });
+}
+
+function spinWheelAnimation(sectorValue) {
+    //const sectorValue = getRandomInt(1, 12);
     // 360 градусов это 12 сектаров, значит 1 сектор это 360 / 12 = 30 градусов
     const sector = 30;
 
@@ -316,4 +347,35 @@ function hideAlertById(alertId) {
 function hideAlert(elem) {
     let alertBlock = elem.closest('.alert');
     alertBlock.remove();
+}
+
+function uuidv4() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+        (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+    );
+}
+
+function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+function deleteCookie(name) {
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
 }
