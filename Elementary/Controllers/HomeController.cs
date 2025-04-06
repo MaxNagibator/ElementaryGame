@@ -2,7 +2,6 @@ using Elementary.Business;
 using Elementary.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace Elementary.Controllers;
 
@@ -24,10 +23,11 @@ public class HomeController : Controller
     [HttpPost]
     public JsonResult SpinWhell()
     {
-        GameValue.SpinWhell();
+        GameValue.SpinWheel();
+
         return new(new
         {
-            SectorValue = GameValue.SectorValue,
+            GameValue.SectorValue,
         });
     }
 
@@ -48,11 +48,13 @@ public class HomeController : Controller
     {
         var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
         QuestionModel? questionModel = null;
+
         if (GameValue.CurrentQuestionId >= 0)
         {
             var question = GameValue.GetCurrentQuestion();
             questionModel = GetQuestionModel(question);
         }
+
         return new(new
         {
             PlayerName = player?.Name,
@@ -80,7 +82,7 @@ public class HomeController : Controller
         var options = question.Options.ToArray();
         Random.Shared.Shuffle(options);
 
-        return new QuestionModel
+        return new()
         {
             Text = question.Value,
             Options = options,
