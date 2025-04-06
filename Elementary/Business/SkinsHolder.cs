@@ -2,7 +2,7 @@
 
 public static class SkinsHolder
 {
-    public static readonly string[] SingleNames =
+    public static readonly string[] TeamNames =
     [
         "Отвязные колбы",
         "Отважные витаминки",
@@ -18,7 +18,7 @@ public static class SkinsHolder
         "Отчаянные исследователи",
     ];
 
-    public static readonly string[] TeamNames =
+    public static readonly string[] SingleNames =
     [
         "Отвязная колба",
         "Отважный магний",

@@ -1,13 +1,13 @@
-﻿let currentPage = 1;
-let currentQuestionNumber = 1;
-let idCookieName = 'my-id'
-let playerId;
+﻿var currentPage = 1;
+var currentQuestionNumber = 1;
+var idCookieName = 'my-id';
+var playerId;
 
 function init() {
     refreshPage();
 
     let id = getCookie(idCookieName);
-    if (id == null) { 
+    if (id == null) {
         id = uuidv4();
         setCookie(idCookieName, id, 1);
     }
@@ -17,7 +17,7 @@ function init() {
         method: 'POST',
         url: '/Home/Join',
         body: {
-            playerId: playerId
+            playerId
         },
         success(data) {
 
@@ -241,12 +241,12 @@ function submitAnswer() {
 document.addEventListener('DOMContentLoaded', init);
 
 var currentAngle = 0;
+
 function spinWheel() {
     SendRequest({
         method: 'POST',
         url: '/Home/SpinWhell',
-        body: {
-        },
+        body: {},
         success(data) {
             const result = JSON.parse(data.responseText);
             spinWheelAnimation(result.sectorValue);
@@ -374,8 +374,8 @@ function getCookie(name) {
     const ca = document.cookie.split(';');
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
 }
