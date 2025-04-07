@@ -12,6 +12,7 @@
             Welcome = 0,
             WhellRun = 1,
             Started = 2,
+            Finish = 3,
         }
 
         public GameState State { get; set; }
@@ -19,15 +20,26 @@
         public int CurrentQuestionId = -1;
 
         public List<Question> Questions = QuestionHolder.GetQuestions();
-        public List<UserAnswer> Answers = [];
         public List<Player> Players { get; set; } = new List<Player>();
         public List<int> FreePlaces { get; set; }
         public int? SectorValue { get; private set; }
         public Guid AdminId { get; internal set; }
 
-        public Question GetNextQuestion()
+        public Question? GetNextQuestion()
         {
+            for (int i = 0; i < Players.Count; i++)
+            {
+                if (Players[i].Answers.Count == CurrentQuestionId)
+                {
+                    Players[i].Answers.Add(new UserAnswer { IsCorrect = false, Value = null });
+                }
+            }
             CurrentQuestionId++;
+            if (CurrentQuestionId >= Questions.Count)
+            {
+                State = GameState.Finish;
+                return null;
+            }
             return Questions[CurrentQuestionId];
         }
 
@@ -39,7 +51,6 @@
         public void InitGame()
         {
             CurrentQuestionId = -1;
-            Answers = [];
             Players = new List<Player>();
             State = GameState.Welcome;
             SectorValue = null;
@@ -56,20 +67,23 @@
 
         public void StartGame()
         {
-            CurrentQuestionId = -1;
-            Answers = [];
+            CurrentQuestionId = 0;
             State = GameState.Started;
         }
 
-        public bool SetAnswer(string value)
+        public bool SetAnswer(Guid playerId, string value)
         {
             var answer = new UserAnswer
             {
                 IsCorrect = string.Equals(Questions[CurrentQuestionId].Answer, value, StringComparison.InvariantCultureIgnoreCase),
                 Value = value,
             };
-
-            Answers.Add(answer);
+            var player = Players.First(x => x.Id == playerId);
+            if (player.Answers.Count > CurrentQuestionId)
+            {
+                throw new BusinessException("вы уже ответили");
+            }
+            player.Answers.Add(answer);
             return answer.IsCorrect;
         }
 
@@ -135,5 +149,7 @@
         public string Descriptionn { get; set; }
         public string Image { get; set; }
         public bool IsSingle { get; set; }
+
+        public List<UserAnswer> Answers { get; set; } = [];
     }
 }

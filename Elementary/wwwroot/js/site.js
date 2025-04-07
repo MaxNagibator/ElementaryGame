@@ -68,68 +68,25 @@ function drawState() {
         game.players = players;
     }
 
-    if (currentPage == 2) {
-        if (game.sectorValue == null && state.sectorValue != null) {
-            game.sectorValue = state.sectorValue;
-            spinWheelAnimation(game.sectorValue);
-        }
 
-        if (game.prevDrawPlayersLength != game.players.length) {
-            // todo ебучая этажерка
-            game.prevDrawPlayersLength = game.players.length;
-
-            // todo сделать, чтоб анимация не прерывалась
-            const circleImages = document.querySelectorAll('.circle-img');
-            circleImages.forEach(img => img.remove());
-
-            const container = document.querySelector('#RuletkaHolder');
-            const centerX = 125;
-            const centerY = 125;
-            const radius = 150;
-
-            for (let i = 0; i < 12; i++) {
-                let isPlaceBusy = false;
-                let number;
-                for (let j = 0; j < game.players.length; j++) {
-                    if (i == game.players[j].placeNumber) {
-                        isPlaceBusy = true;
-                        number = game.players[j].teamNumber
-                        break;
-                    }
-                }
-
-                if (!isPlaceBusy) {
-                    continue;
-                }
-
-                const angle = (i * (2 * Math.PI / 12)) - Math.PI / 2;
-
-                const x = centerX + radius * Math.cos(angle);
-                const y = centerY + radius * Math.sin(angle);
-
-                const imgDiv = document.createElement('div');
-                imgDiv.className = 'circle-img';
-                imgDiv.style.left = `${x}px`;
-                imgDiv.style.top = `${y}px`;
-
-                imgDiv.innerHTML = '<img src="/images/teams/' + number + '.png" alt="img">';
-
-                container.appendChild(imgDiv);
-            }
-        }
-    }
+    let status = {
+        welcome: 0,
+        whellrun: 1,
+        started: 2,
+        finish: 3
+    };
 
     if (isAdmin) {
-        let status = {
-            welcome: 0,
-            whellrun: 1,
-            started: 2
-        };
-        if (state.state == status.started) {
-            toQuestionPage(4);
+        if (state.gameState == status.started) {
+            toQuestionPage(state.question);
         } else {
-            // todo magic 2
-            changePage(2);
+
+            if (state.gameState == status.finish) {
+                toAdminStatPage(state.players);
+            } else {
+                // todo magic 2
+                changePage(2);
+            }
         }
     } else {
         let title = document.getElementById('TeamTitle');
@@ -144,8 +101,11 @@ function drawState() {
             let image = document.getElementById('TeamTitleImage');
             image.src = "/images/skins/" + state.player.image;
             if (state.question) {
-                // todo magic 4
-                toQuestionPage(4);
+                toQuestionPage(state.question);
+            } else {
+                if (state.gameState == status.finish) {
+                    toStatPage(state.player);
+                }
             }
         } else {
             title.classList.add('hidden');
@@ -153,6 +113,59 @@ function drawState() {
                 changePage(2);
             } else {
                 changePage(1);
+            }
+        }
+    }
+
+    if (currentPage == 2) {
+        if (game.sectorValue == null && state.sectorValue != null) {
+            game.sectorValue = state.sectorValue;
+            spinWheelAnimation(game.sectorValue);
+        }
+
+        if (game.players) {
+            if (game.prevDrawPlayersLength != game.players.length) {
+                // todo ебучая этажерка
+                game.prevDrawPlayersLength = game.players.length;
+
+                // todo сделать, чтоб анимация не прерывалась
+                const circleImages = document.querySelectorAll('.circle-img');
+                circleImages.forEach(img => img.remove());
+
+                const container = document.querySelector('#RuletkaHolder');
+                const centerX = 125;
+                const centerY = 125;
+                const radius = 150;
+
+                for (let i = 0; i < 12; i++) {
+                    let isPlaceBusy = false;
+                    let number;
+                    for (let j = 0; j < game.players.length; j++) {
+                        if (i == game.players[j].placeNumber) {
+                            isPlaceBusy = true;
+                            number = game.players[j].teamNumber
+                            break;
+                        }
+                    }
+
+                    if (!isPlaceBusy) {
+                        continue;
+                    }
+
+                    const angle = (i * (2 * Math.PI / 12)) - Math.PI / 2;
+
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'circle-img';
+                    imgDiv.style.left = `${x}px`;
+                    imgDiv.style.top = `${y}px`;
+
+                    imgDiv.innerHTML = '<img src="/images/teams/' + number + '.png" alt="img">';
+
+                    container.appendChild(imgDiv);
+                }
             }
         }
     }
@@ -272,7 +285,9 @@ function loadQuestion() {
         },
         success(data) {
             const question = JSON.parse(data.responseText);
-            toQuestionPage(question);
+            if (question) {
+                toQuestionPage(question);
+            }
         }
     });
 }
@@ -281,8 +296,40 @@ function toQuestionPage(question) {
     renderQuestion(question);
     changePage(4);
 }
+function toStatPage(player) {
+    renderStat(player);
+    changePage(5);
+}
+
+function renderStat(player) {
+    let correct = 0;
+    for (let i = 0; i < player.answers.length; i++) {
+        correct += player.answers[i].isCorrect;
+    }
+    document.getElementById('StatBlock').innerHTML = correct + '/' + player.answers.length;
+}
+
+function toAdminStatPage(players) {
+    let html = "";
+    for (let p = 0; p < players.length; p++) {
+        let player = players[p];
+        let correct = 0;
+        for (let i = 0; i < player.answers.length; i++) {
+            correct += player.answers[i].isCorrect;
+        }
+        html += correct + '/' + player.answers.length;
+    }
+    document.getElementById('StatBlock').innerHTML = html
+}
+
+let currentQuestion = null;
 
 function renderQuestion(question) {
+    if (currentQuestion == question.text) {
+        return;
+    }
+    currentQuestion = question.text;
+
     const block = document.getElementById('QuestionBlock');
     block.innerHTML = `
         <h3>Вопрос ${currentQuestionNumber}</h3>
@@ -299,17 +346,24 @@ function renderQuestion(question) {
         }
     `;
 
+    const answerContainer = document.getElementById('AnswerBlock');
+    answerContainer.innerHTML = "";
     if (isAdmin) {
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Следующий вопрос';
+        nextBtn.onclick = nextQuestion;
+        nextBtn.disabled = false;
+        answerContainer.appendChild(nextBtn);
         return;
     }
 
-    const answerContainer = document.getElementById('AnswerBlock');
     const confirmBtn = document.createElement('button');
     confirmBtn.className = 'btn btn-info confirm-btn';
     confirmBtn.textContent = 'Подтвердить ответ';
     confirmBtn.disabled = true;
     confirmBtn.onclick = submitAnswer;
     answerContainer.appendChild(confirmBtn);
+
 
     const inputs = document.querySelectorAll('.text-input');
     const optionBtns = document.querySelectorAll('.option-btn');
@@ -353,6 +407,9 @@ function submitAnswer() {
     const confirmBtn = document.querySelector('.confirm-btn');
     confirmBtn.disabled = true;
     confirmBtn.textContent = 'Ответ принят';
+    if (!isAdmin) {
+        confirmBtn.classList.add('hidden');
+    }
 
     let answer;
 
@@ -368,7 +425,8 @@ function submitAnswer() {
         method: 'POST',
         url: '/Home/SetAnswer',
         body: {
-            value: answer
+            value: answer,
+            playerId: playerId,
         },
         success(data) {
             const result = JSON.parse(data.responseText);
@@ -439,14 +497,14 @@ function spinWheelAnimation(sectorValue) {
     var ruletkaDiv = document.getElementById('ruletka');
 
     var rounds = getRandomInt(2, 5);
-    const time = 1;// getRandomInt(3, 8);
+    const time = getRandomInt(3, 8);
     var angle = rounds * 360 + sectorValue * sector;
     ruletkaDiv.style.transition = `transform ${time}s cubic-bezier(0.1, 0.7, 0.1, 1)`;
     ruletkaDiv.style.transform = `rotate(${angle}deg)`;
     setTimeout(function () {
         spinWheelAnimationStop = true;
         drawState();
-    }, ((time+1) * 1000));
+    }, ((time + 1) * 1000));
 }
 
 function getRandomInt(min, max) {

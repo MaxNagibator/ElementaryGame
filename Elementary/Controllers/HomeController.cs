@@ -94,8 +94,12 @@ public class HomeController : Controller
         return new(GetQuestionModel(question));
     }
 
-    private QuestionModel GetQuestionModel(Question question)
+    private QuestionModel? GetQuestionModel(Question question)
     {
+        if(question == null)
+        {
+            return null;
+        }
         var options = question.Options.ToArray();
         Random.Shared.Shuffle(options);
 
@@ -117,7 +121,7 @@ public class HomeController : Controller
     [HttpPost]
     public JsonResult SetAnswer([FromBody] SetAnswerModel model)
     {
-        var isCorrect = GameValue.SetAnswer(model.Value);
+        var isCorrect = GameValue.SetAnswer(model.PlayerId, model.Value);
         var currentQuestion = GameValue.GetCurrentQuestion();
 
         return new(new
@@ -135,7 +139,7 @@ public class HomeController : Controller
     }
 }
 
-public class SetAnswerModel
+public class SetAnswerModel : PlayerIdModel
 {
     public string Value { get; set; }
 }
