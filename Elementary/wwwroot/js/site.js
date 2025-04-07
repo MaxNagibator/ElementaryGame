@@ -2,30 +2,146 @@
 let currentQuestionNumber = 1;
 let idCookieName = 'my-id'
 let playerId;
+let isAdmin; // todo чёто в game запихали, чёто тут, бардак!
+let isJoin;
+
+setInterval(function () {
+    getStatus();
+}, 1000);
 
 function init() {
     refreshPage();
 
+    if (window.location.search.includes('admin')) {
+        isAdmin = true
+    }
+
     let id = getCookie(idCookieName);
-    if (id == null) { 
+    if (id == null) {
         id = uuidv4();
         setCookie(idCookieName, id, 1);
     }
     playerId = id;
 
+    getStatus();
+}
+
+function getStatus() {
     SendRequest({
         method: 'POST',
-        url: '/Home/Join',
+        url: '/Home/GetState',
         body: {
-            playerId: playerId
+            playerId: playerId,
         },
         success(data) {
+            const state = JSON.parse(data.responseText);
+            if (state.player) {
+                isJoin = true;
+                game.player = state.player;
+            }
 
+            if (state.players) {
+                players = []
+                for (var i = 0; i < state.players.length; i++) {
+                    let player = {
+                        id: state.players[i].id,
+                        placeNumber: state.players[i].placeNumber,
+                        name: state.players[i].name,
+                        descriptionn: state.players[i].descriptionn,
+                        image: state.players[i].image,
+                        isSingle: state.players[i].isSingle,
+                    }
+                    players.push(player);
+                }
+                game.players = players;
+            }
+
+            if (currentPage == 2) {
+                if (game.prevDrawPlayersLength != game.players.length) {
+                    // todo ебучая этажерка
+                    game.prevDrawPlayersLength = game.players.length;
+
+                    // todo сделать, чтоб анимация не прерывалась
+                    const circleImages = document.querySelectorAll('.circle-img');
+                    circleImages.forEach(img => img.remove());
+
+                    const container = document.querySelector('#RuletkaHolder');
+                    const centerX = 125;
+                    const centerY = 125;
+                    const radius = 150;
+
+                    for (let i = 0; i < 12; i++) {
+                        let placeNumber = i + 1;
+                        let isPlaceBusy = false;
+                        for (let j = 0; j < game.players.length; j++) {
+                            if (placeNumber == game.players[j].placeNumber) {
+                                isPlaceBusy = true;
+                                break;
+                            }
+                        }
+
+                        if (!isPlaceBusy) {
+                            continue;
+                        }
+                        const angle = (i * (2 * Math.PI / 12)) - Math.PI / 2;
+
+                        const x = centerX + radius * Math.cos(angle);
+                        const y = centerY + radius * Math.sin(angle);
+
+                        const imgDiv = document.createElement('div');
+                        imgDiv.className = 'circle-img';
+                        imgDiv.style.left = `${x}px`;
+                        imgDiv.style.top = `${y}px`;
+
+                        imgDiv.innerHTML = '<img src="/images/teams/' + (placeNumber) + '.png" alt="img">';
+
+                        container.appendChild(imgDiv);
+                    }
+                }
+            }
+
+            if (isAdmin) {
+                let status = {
+                    welcome: 0,
+                    whellrun: 1,
+                    started: 2
+                };
+                if (state.state == status.started) {
+                    toQuestionPage(4);
+                } else {
+                    // todo magic 2
+                    changePage(2);
+                }
+            } else {
+                let title = document.getElementById('TeamTitle');
+                if (game.player.name) {
+                    title.classList.remove('hidden');
+                    let nameLabel = document.getElementById('TeamTitleName');
+                    nameLabel.innerHTML = state.playerName;
+                    let image = document.getElementById('TeamTitleImage');
+                    image.src = state.playerImage;
+                    if (question) {
+                        // todo magic 4
+                        toQuestionPage(4);
+                    }
+                } else {
+                    title.classList.add('hidden');
+                    if (isJoin) {
+                        changePage(2);
+                    } else {
+                        changePage(1);
+                    }
+                }
+            }
         }
     });
 }
 
 function changePage(page) {
+    if (currentPage == page) {
+        // отключить мерцание
+        return;
+    }
     currentPage = page;
     refreshPage();
 }
@@ -44,8 +160,19 @@ function refreshPage() {
 game = {};
 
 function setMode(val) {
-    game.mode = val;
-    changePage(2);
+    SendRequest({
+        method: 'POST',
+        url: '/Home/Join',
+        body: {
+            playerId: playerId,
+            isAdmin: isAdmin,
+            isSingle: val,
+        },
+        success(data) {
+            isJoin = true;
+            changePage(2);
+        }
+    });
 }
 
 function setSkin(val) {
@@ -104,10 +231,14 @@ function loadQuestion() {
         },
         success(data) {
             const question = JSON.parse(data.responseText);
-            renderQuestion(question);
-            changePage(4);
+            toQuestionPage(question);
         }
     });
+}
+
+function toQuestionPage(question) {
+    renderQuestion(question);
+    changePage(4);
 }
 
 function renderQuestion(question) {
@@ -116,16 +247,20 @@ function renderQuestion(question) {
         <h3>Вопрос ${currentQuestionNumber}</h3>
         <div class="question-text">${question.text}</div>
         ${question.type === 'text' ?
-        `<div class="text-inputs-container">
+            `<div class="text-inputs-container">
             ${Array.from({ length: 4 }, (_, i) => `
             <input type="text" class="text-input" maxlength="1" data-index="${i}">
         `).join('')}
         </div>` :
-        `<div class="options-table">${question.options.map(o => `
+            `<div class="options-table">${question.options.map(o => `
                 <div class="option-btn">${o}</div>
             `).join('')}</div>`
-    }
+        }
     `;
+
+    if (isAdmin) {
+        return;
+    }
 
     const answerContainer = document.getElementById('AnswerBlock');
     const confirmBtn = document.createElement('button');
@@ -293,7 +428,7 @@ function SendRequest(options) {
                 if (_this.options.success) {
                     _this.options.success(this);
                 }
-            } else if (this.status == 403) {
+            } else if (this.status == 400) {
                 showAlert('Внимание', this.responseText, 5);
             } else {
                 if (_this.options.error) {

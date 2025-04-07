@@ -34,7 +34,25 @@ public class HomeController : Controller
     [HttpPost]
     public JsonResult Join([FromBody] JoinModel model)
     {
-        GameValue.Join(model.PlayerId, model.IsSingle);
+        if (model.IsAdmin)
+        {
+            // а нахер не надо, на фронте всё раскидаем
+            GameValue.AdminId = model.PlayerId;
+        }
+        else
+        {
+            GameValue.Join(Guid.NewGuid(), true);
+            GameValue.Join(Guid.NewGuid(), true);
+            GameValue.Join(Guid.NewGuid(), true);
+            GameValue.Join(Guid.NewGuid(), false);
+            GameValue.Join(Guid.NewGuid(), false);
+            GameValue.Join(Guid.NewGuid(), false);
+            GameValue.Join(Guid.NewGuid(), true);
+            GameValue.Join(Guid.NewGuid(), true);
+            GameValue.Join(Guid.NewGuid(), true);
+            GameValue.Join(model.PlayerId, model.IsSingle);
+        }
+
         return GetStateInternal(model.PlayerId);
     }
 
@@ -48,16 +66,18 @@ public class HomeController : Controller
     {
         var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
         QuestionModel? questionModel = null;
-        if (GameValue.CurrentQuestionId >= 0)
+        if (GameValue.State == Game.GameState.Started)
         {
             var question = GameValue.GetCurrentQuestion();
             questionModel = GetQuestionModel(question);
         }
+
         return new(new
         {
-            PlayerName = player?.Name,
-            PlayerImage = player?.Image,
+            GameState = (int)GameValue.State,
+            Player = player,
             Question = questionModel,
+            Players = GameValue.State == Game.GameState.Started ? null : GameValue.Players,
         });
     }
 
@@ -129,4 +149,5 @@ public class PlayerIdModel
 public class JoinModel : PlayerIdModel
 {
     public bool IsSingle { get; set; }
+    public bool IsAdmin { get; set; }
 }

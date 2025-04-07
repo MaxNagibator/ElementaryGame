@@ -31,6 +31,7 @@
         public List<Player> Players { get; set; } = new List<Player>();
         public List<int> FreePlaces { get; set; }
         public int SectorValue { get; private set; }
+        public Guid AdminId { get; internal set; }
 
         public Question GetNextQuestion()
         {
@@ -66,7 +67,7 @@
         {
             if (State != GameState.Welcome)
             {
-                throw new Exception("need welcome state");
+                throw new BusinessException("Ожидайте, пока администатор начнёт сбор желающих поиграть");
             }
 
             if (Players.Any(x => x.Id == playerId))

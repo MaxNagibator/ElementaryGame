@@ -20,7 +20,16 @@
             Периодический закон и периодическая система Д. И. Менделеева. Электронный период в развитии химии.
         </label>
     </div>*@
+    <div>
+        <div id="TeamTitle">
+            <label id="TeamTitleName">
 
+            </label>
+            <image id="TeamTitleImage">
+
+            </image>
+        </div>
+    </div>
     <div>
         DEBUG:
         <button class="btn btn-info"
@@ -35,19 +44,22 @@
          class="game-page">
         <h2>Выбор режима</h2>
         <button class="btn btn-info"
-                onclick="setMode(1)">Одиночный
+                onclick="setMode(true)">Одиночный
         </button>
         <button class="btn btn-info"
-                onclick="setMode(2)">Командный
+                onclick="setMode(false)">Командный
         </button>
     </div>
 
     <div id="page-2"
          class="game-page hidden">
         <h2>Колесо фортуны</h2>
-        <img id="ruletka"
+        <div id="RuletkaHolder" style="position: relative">
+            <img id="ruletka"
              src="~/images/ruletka.png"
-             style="width: 250px;" />
+             style="width: 250px;    position: relative;
+    z-index: 122;" />
+        </div>
         <button class="btn btn-success"
                 onclick="spinWheel()">Крутить колесо
         </button>
