@@ -2,7 +2,7 @@
 {
     public static class PlayerConsts
     {
-        public static string[] SingleNames = new string[]
+        public static string[] TeamNames = new string[]
         {
             "Отвязные колбы",
             "Отважные витаминки",
@@ -18,7 +18,7 @@
             "Отчаянные исследователи"
         };
 
-        public static string[] TeamNames = new string[]
+        public static string[] SingleNames = new string[]
         {
             "Отвязная колба",
             "Отважный магний",

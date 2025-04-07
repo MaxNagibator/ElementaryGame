@@ -21,22 +21,34 @@
         </label>
     </div>*@
     <div>
+        <label id="TeamNumber">
+
+        </label>
         <div id="TeamTitle">
             <label id="TeamTitleName">
 
             </label>
-            <image id="TeamTitleImage">
+            <image id="TeamTitleImage" style="width: 50px">
 
             </image>
         </div>
     </div>
-    <div>
-        DEBUG:
-        <button class="btn btn-info"
-                onclick="setSkin(1)">выбрать скин
+    <div id="AdminButtons" class="hidden">
+@*         <button class="btn btn-info"
+                onclick="setSkin(1)">
+            выбрать скин
+        </button> *@
+        <button class="btn btn-success"
+                onclick="initGame()">
+            инициализация
         </button>
         <button class="btn btn-success"
-                onclick="startGame()">начинаем
+                onclick="spinWheel()">
+            Крутить колесо
+        </button>
+        <button class="btn btn-success"
+                onclick="startGame()">
+            начинаем
         </button>
     </div>
 
@@ -44,35 +56,36 @@
          class="game-page">
         <h2>Выбор режима</h2>
         <button class="btn btn-info"
-                onclick="setMode(true)">Одиночный
+                onclick="setMode(true)">
+            Одиночный
         </button>
         <button class="btn btn-info"
-                onclick="setMode(false)">Командный
+                onclick="setMode(false)">
+            Командный
         </button>
     </div>
 
     <div id="page-2"
          class="game-page hidden">
         <h2>Колесо фортуны</h2>
-        <div id="RuletkaHolder" style="position: relative">
+        <div id="RuletkaHolder" style="position: relative; width: 250px; margin-top: 100px;margin-left: auto; margin-right: auto;">
             <img id="ruletka"
-             src="~/images/ruletka.png"
-             style="width: 250px;    position: relative;
+                 src="~/images/ruletka.png"
+                 style="width: 250px;    position: relative;
     z-index: 122;" />
         </div>
-        <button class="btn btn-success"
-                onclick="spinWheel()">Крутить колесо
-        </button>
     </div>
 
     <div id="page-3"
          class="game-page hidden">
         <h2>Выбор уровня</h2>
         <button class="btn btn-info"
-                onclick="setLevel(1)">Начальный
+                onclick="setLevel(1)">
+            Начальный
         </button>
         <button class="btn btn-info"
-                onclick="setLevel(2)">Продвинутый
+                onclick="setLevel(2)">
+            Продвинутый
         </button>
     </div>
 

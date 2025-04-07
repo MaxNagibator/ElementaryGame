@@ -4,15 +4,7 @@
     {
         public Game()
         {
-            var freePlaces = new int[12];
-            for (var i = 0; i < 12; i++)
-            {
-                freePlaces[i] = i;
-            }
-
-            Random.Shared.Shuffle(freePlaces);
-            FreePlaces = freePlaces.ToList();
-            State = GameState.Welcome;
+            InitGame();
         }
 
         public enum GameState
@@ -30,7 +22,7 @@
         public List<UserAnswer> Answers = [];
         public List<Player> Players { get; set; } = new List<Player>();
         public List<int> FreePlaces { get; set; }
-        public int SectorValue { get; private set; }
+        public int? SectorValue { get; private set; }
         public Guid AdminId { get; internal set; }
 
         public Question GetNextQuestion()
@@ -42,6 +34,24 @@
         public Question GetCurrentQuestion()
         {
             return Questions[CurrentQuestionId];
+        }
+
+        public void InitGame()
+        {
+            CurrentQuestionId = -1;
+            Answers = [];
+            Players = new List<Player>();
+            State = GameState.Welcome;
+            SectorValue = null;
+
+            var freePlaces = new int[12];
+            for (var i = 0; i < 12; i++)
+            {
+                freePlaces[i] = i;
+            }
+
+            Random.Shared.Shuffle(freePlaces);
+            FreePlaces = freePlaces.ToList();
         }
 
         public void StartGame()
@@ -76,22 +86,32 @@
             }
 
             var number = FreePlaces[Players.Count];
-            Players.Add(new Player { Id = playerId, PlaceNumber = number, IsSingle = isSingle });
+            var player = new Player
+            {
+                Id = playerId,
+                PlaceNumber = number,
+                IsSingle = isSingle,
+                TeamNumber = Players.Count + 1
+            };
+            Players.Add(player);
         }
 
-        internal void SpinWhell()
+        public void SpinWhell()
         {
             State = GameState.WhellRun;
             var sectorValue = Random.Shared.Next(0, 12);
             SectorValue = sectorValue;
             for (var i = 0; i < Players.Count; i++)
             {
-                var myNumber = Players[i].PlaceNumber + sectorValue;
+                var myNumber = 12 - Players[i].PlaceNumber;
+
+                myNumber = myNumber + sectorValue;
                 if (myNumber >= 12)
                 {
                     // todo волшебная 12 в константы
                     myNumber = myNumber - 12;
                 }
+
                 if (Players[i].IsSingle)
                 {
                     Players[i].Name = PlayerConsts.SingleNames[myNumber];
@@ -101,6 +121,7 @@
                     Players[i].Name = PlayerConsts.TeamNames[myNumber];
                 }
                 Players[i].Descriptionn = PlayerConsts.TeamNames[myNumber];
+                Players[i].Image = (myNumber + 1) + ".png";
             }
         }
     }
@@ -109,6 +130,7 @@
     {
         public Guid Id { get; set; }
         public int PlaceNumber { get; set; }
+        public int TeamNumber { get; set; }
         public string Name { get; set; }
         public string Descriptionn { get; set; }
         public string Image { get; set; }

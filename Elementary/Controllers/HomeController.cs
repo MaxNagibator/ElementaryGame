@@ -22,16 +22,6 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public JsonResult SpinWhell()
-    {
-        GameValue.SpinWhell();
-        return new(new
-        {
-            SectorValue = GameValue.SectorValue,
-        });
-    }
-
-    [HttpPost]
     public JsonResult Join([FromBody] JoinModel model)
     {
         if (model.IsAdmin)
@@ -41,15 +31,6 @@ public class HomeController : Controller
         }
         else
         {
-            GameValue.Join(Guid.NewGuid(), true);
-            GameValue.Join(Guid.NewGuid(), true);
-            GameValue.Join(Guid.NewGuid(), true);
-            GameValue.Join(Guid.NewGuid(), false);
-            GameValue.Join(Guid.NewGuid(), false);
-            GameValue.Join(Guid.NewGuid(), false);
-            GameValue.Join(Guid.NewGuid(), true);
-            GameValue.Join(Guid.NewGuid(), true);
-            GameValue.Join(Guid.NewGuid(), true);
             GameValue.Join(model.PlayerId, model.IsSingle);
         }
 
@@ -78,7 +59,15 @@ public class HomeController : Controller
             Player = player,
             Question = questionModel,
             Players = GameValue.State == Game.GameState.Started ? null : GameValue.Players,
+            SectorValue = GameValue.SectorValue,
         });
+    }
+
+    [HttpPost]
+    public JsonResult InitGame()
+    {
+        GameValue.InitGame();
+        return new(new { Text = "Vrum Wrum" });
     }
 
     [HttpPost]
@@ -86,6 +75,16 @@ public class HomeController : Controller
     {
         GameValue.StartGame();
         return new(new { Text = "Vrum Wrum" });
+    }
+
+    [HttpPost]
+    public JsonResult SpinWhell()
+    {
+        GameValue.SpinWhell();
+        return new(new
+        {
+            SectorValue = GameValue.SectorValue,
+        });
     }
 
     [HttpPost]
