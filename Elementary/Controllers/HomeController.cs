@@ -1,8 +1,7 @@
-using Elementary.Business;
+ï»¿using Elementary.Business;
 using Elementary.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace Elementary.Controllers;
 
@@ -26,7 +25,7 @@ public class HomeController : Controller
     {
         if (model.IsAdmin)
         {
-            // à íàõåð íå íàäî, íà ôðîíòå âñ¸ ðàñêèäàåì
+            // Ð° Ð½Ð°Ñ…ÐµÑ€ Ð½Ðµ Ð½Ð°Ð´Ð¾, Ð½Ð° Ñ„Ñ€Ð¾Ð½Ñ‚Ðµ Ð²ÑÑ‘ Ñ€Ð°ÑÐºÐ¸Ð´Ð°ÐµÐ¼
             GameValue.AdminId = model.PlayerId;
         }
         else
@@ -47,6 +46,7 @@ public class HomeController : Controller
     {
         var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
         QuestionModel? questionModel = null;
+
         if (GameValue.State == Game.GameState.Started)
         {
             var question = GameValue.GetCurrentQuestion();
@@ -81,9 +81,10 @@ public class HomeController : Controller
     public JsonResult SpinWhell()
     {
         GameValue.SpinWhell();
+
         return new(new
         {
-            SectorValue = GameValue.SectorValue,
+            GameValue.SectorValue,
         });
     }
 
@@ -94,16 +95,17 @@ public class HomeController : Controller
         return new(GetQuestionModel(question));
     }
 
-    private QuestionModel? GetQuestionModel(Question question)
+    private QuestionModel? GetQuestionModel(Question? question)
     {
-        if(question == null)
+        if (question == null)
         {
             return null;
         }
+
         var options = question.Options.ToArray();
         Random.Shared.Shuffle(options);
 
-        return new QuestionModel
+        return new()
         {
             Text = question.Value,
             Options = options,

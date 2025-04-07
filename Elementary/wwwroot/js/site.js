@@ -67,7 +67,6 @@ function drawState() {
         game.players = players;
     }
 
-
     let status = {
         welcome: 0,
         whellrun: 1,
@@ -89,9 +88,20 @@ function drawState() {
         }
     } else {
         let title = document.getElementById('TeamTitle');
+        let teamNumber = document.getElementById('TeamNumber');
+
         if (state.player != null) {
-            document.getElementById('TeamNumber').innerHTML = "№" + state.player.teamNumber;
+            let text = "№" + state.player.teamNumber;
+
+            if (teamNumber.innerHTML !== text) {
+                teamNumber.innerHTML = text;
+            }
+        } else {
+            if (teamNumber.innerHTML !== "") {
+                teamNumber.innerHTML = "";
+            }
         }
+
         if (state.player != null && state.player.name && spinWheelAnimationStop) {
 
             title.classList.remove('hidden');
@@ -167,6 +177,8 @@ function drawState() {
                 }
             }
         }
+    } else {
+        game.prevDrawPlayersLength = 0;
     }
 }
 
@@ -320,7 +332,7 @@ function toAdminStatPage(players) {
     document.getElementById('StatBlock').innerHTML = html;
 }
 
-let currentQuestion = null;
+var currentQuestion = null;
 
 function renderQuestion(question) {
     if (currentQuestion === question.text) {
@@ -440,26 +452,26 @@ function submitAnswer() {
                 });
             }
 
-            if (result.imageUrl) {
-                const explanationContainer = document.getElementById('Explanation');
-                explanationContainer.classList.add('visible');
 
-                const explanationImage = document.createElement('img');
-                explanationImage.src = `/images/explanations/q${currentQuestionNumber}.png`;
-                explanationImage.className = 'explanation-image';
-                explanationContainer.appendChild(explanationImage);
+            const explanationContainer = document.getElementById('Explanation');
+            explanationContainer.classList.add('visible');
 
-                setTimeout(() => {
-                    const rect = explanationContainer.getBoundingClientRect();
-                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
-                        explanationContainer.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                            inline: 'nearest',
-                        });
-                    }
-                }, 150);
-            }
+            const explanationImage = document.createElement('img');
+            explanationImage.src = `/images/explanations/q${currentQuestionNumber}.png`;
+            explanationImage.className = 'explanation-image';
+            explanationContainer.appendChild(explanationImage);
+
+            setTimeout(() => {
+                const rect = explanationContainer.getBoundingClientRect();
+                if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                    explanationContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'nearest',
+                    });
+                }
+            }, 150);
+
 
             setTimeout(() => {
                 confirmBtn.textContent = 'Следующий вопрос';
