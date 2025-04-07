@@ -103,12 +103,47 @@ function drawState() {
         }
 
         if (state.player != null && state.player.name && spinWheelAnimationStop) {
-
-            title.classList.remove('hidden');
             let nameLabel = document.getElementById('TeamTitleName');
-            nameLabel.innerHTML = state.player.name;
-            let image = document.getElementById('TeamTitleImage');
-            image.src = "/images/skins/" + state.player.image;
+
+            if (state.player.name !== nameLabel.innerHTML) {
+                title.classList.remove('hidden');
+                nameLabel.innerHTML = state.player.name;
+                let image = document.getElementById('TeamTitleImage');
+                image.src = "/images/skins/" + state.player.image;
+            }
+
+            const skinBlock = document.getElementById('SkinBlock');
+
+            if (!skinBlock.querySelector('div')) {
+                skinBlock.classList.remove('hidden');
+
+                const card = document.createElement('div');
+                card.className = 'player-card';
+
+                const img = new Image();
+                img.src = "/images/skins/" + state.player.image;
+                img.className = 'player-image';
+                img.alt = state.player.name;
+
+                const name = document.createElement('div');
+                name.className = 'player-name';
+                name.textContent = state.player.name;
+
+                const description = document.createElement('div');
+                description.className = 'player-description';
+                description.textContent = state.player.descriptionn;
+
+                card.appendChild(img);
+                card.appendChild(name);
+                card.appendChild(description);
+
+                card.style.opacity = 0;
+                setTimeout(() => card.style.opacity = 1, 50);
+
+                skinBlock.innerHTML = '';
+                skinBlock.appendChild(card);
+            }
+
             if (state.question) {
                 toQuestionPage(state.question);
             } else {
@@ -208,8 +243,8 @@ function setMode(val) {
         method: 'POST',
         url: '/Home/Join',
         body: {
-            playerId: playerId,
-            isAdmin: isAdmin,
+            playerId,
+            isAdmin,
             isSingle: val,
         },
         success(data) {
@@ -436,7 +471,7 @@ function submitAnswer() {
         url: '/Home/SetAnswer',
         body: {
             value: answer,
-            playerId: playerId,
+            playerId,
         },
         success(data) {
             const result = JSON.parse(data.responseText);

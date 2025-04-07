@@ -134,7 +134,7 @@
                 {
                     Players[i].Name = PlayerConsts.TeamNames[myNumber];
                 }
-                Players[i].Descriptionn = PlayerConsts.TeamNames[myNumber];
+                Players[i].Descriptionn = PlayerConsts.Descriptions[myNumber];
                 Players[i].Image = (myNumber + 1) + ".png";
             }
         }
