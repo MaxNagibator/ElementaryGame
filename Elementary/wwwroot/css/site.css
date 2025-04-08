@@ -340,6 +340,18 @@ body {
     transform-style: preserve-3d;
 }
 
+.level-btn.active {
+    border: 3px solid darkgreen !important;
+}
+
+.question-type-link .option-btn {
+
+}
+
+.question-type-link .target-option-btn {
+
+}
+
 .player-image {
     width: 200px;
     margin: auto 10px;

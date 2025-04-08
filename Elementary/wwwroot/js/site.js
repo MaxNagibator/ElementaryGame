@@ -13,7 +13,7 @@ setInterval(function () {
 
 function init() {
     refreshPage();
-
+    game.level = 1;
     if (window.location.search.includes('admin')) {
         isAdmin = true;
         btns = document.getElementById('AdminButtons');
@@ -261,14 +261,10 @@ function setMode(val) {
     });
 }
 
-function setSkin(val) {
-    changePage(3);
-    startGame();
-}
-
-function setLevel(val) {
+function setLevel(elem, val) {
     game.level = val;
-    loadQuestion();
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+    elem.classList.add('active');
 }
 
 function initGame() {
@@ -290,7 +286,9 @@ function startGame() {
     SendRequest({
         method: 'POST',
         url: '/Home/StartGame',
-        body: {},
+        body: {
+            level: game.level,
+        },
         success(data) {
         },
     });
@@ -417,20 +415,36 @@ var currentAnswer = null;
 
 function renderQuestion(question) {
     const block = document.getElementById('QuestionBlock');
-    block.innerHTML = `
-        <h3>Вопрос ${question.id + 1}</h3>
-        <div class="question-text">${question.text}</div>
-        ${question.type === 'text' ?
-        `<div class="text-inputs-container">
+    let questionShow = '';
+    let qtype = "question-type-" + question.type;
+    if (question.type === 'text') {
+        questionShow = `<div class="text-inputs-container">
             ${Array.from({ length: 4 }, (_, i) => `
             <input type="text" class="text-input" maxlength="1" data-index="${i}">
         `).join('')}
-        </div>` :
-        `<div class="options-table">${question.options.map(o => `
+        </div>`;
+    } else if (question.type === 'multiple') {
+        questionShow = `<div class="options-table">${question.options.map(o => `
                 <div class="option-btn">${o}</div>
-            `).join('')}</div>`
+            `).join('')}</div>`;
+    } else if (question.type === 'link') {
+        questionShow += '<div class="options-table ' + qtype+ '">';
+        for (let i = 0; i < question.options.length; i++) {
+            questionShow += '<div class="option-btn">' + question.options[i] + '</div>'
+        }
+        for (let i = 0; i < question.targetOptions.length; i++) {
+            questionShow += '<div class="target-option-btn">' + question.targetOptions[i] + '</div>'
+        }
+        questionShow += '</div>';
+
+    } else {
+        alert('всё сломалось');
     }
-    `;
+
+    block.innerHTML = `
+        <h3>Вопрос ${question.id + 1}</h3>
+        <div class="question-text">${question.text}</div>
+        ${questionShow}`;
 
     const answerContainer = document.getElementById('AnswerBlock');
     answerContainer.innerHTML = "";

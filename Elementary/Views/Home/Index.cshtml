@@ -32,6 +32,15 @@
                 onclick="startGame()">
             начинаем
         </button>
+        <h2>Выбор уровня</h2>
+        <button class="btn btn-info level-btn active"
+                onclick="setLevel(this, 1)">
+            Начальный
+        </button>
+        <button class="btn btn-info level-btn"
+                onclick="setLevel(this, 2)">
+            Продвинутый
+        </button>
     </div>
 
     <div id="page-1"
@@ -66,15 +75,7 @@
 
     <div id="page-3"
          class="game-page hidden">
-        <h2>Выбор уровня</h2>
-        <button class="btn btn-info"
-                onclick="setLevel(1)">
-            Начальный
-        </button>
-        <button class="btn btn-info"
-                onclick="setLevel(2)">
-            Продвинутый
-        </button>
+         <h2>Если вы это видите, то это ошибка.</h2>
     </div>
 
     <div id="page-4"

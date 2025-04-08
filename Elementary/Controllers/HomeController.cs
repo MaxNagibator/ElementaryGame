@@ -72,9 +72,9 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public JsonResult StartGame()
+    public JsonResult StartGame([FromBody] StartGameModel model)
     {
-        GameValue.StartGame();
+        GameValue.StartGame(model.Level);
         return new(new { Text = "Vrum Wrum" });
     }
 
@@ -104,14 +104,19 @@ public class HomeController : Controller
         }
 
         var options = question.Options.ToArray();
-        Random.Shared.Shuffle(options);
+        if (question.Type == "multiple")
+        {
+            // дорого реализовывать передачу ответа
+            Random.Shared.Shuffle(options);
+        }
 
         return new()
         {
             Id = GameValue.CurrentQuestionId,
             Text = question.Value,
             Options = options,
-            Type = question.Options.Count > 0 ? "multiple" : "text",
+            TargetOptions = question.TargetOptions.ToArray(),
+            Type = question.Type,
         };
     }
 
@@ -121,6 +126,7 @@ public class HomeController : Controller
         public string Text { get; set; }
         public string[] Options { get; set; }
         public string Type { get; set; }
+        public string[] TargetOptions { get; set; }
     }
 
     [HttpPost]
@@ -152,6 +158,11 @@ public class SetAnswerModel : PlayerIdModel
 public class PlayerIdModel
 {
     public Guid PlayerId { get; set; }
+}
+
+public class StartGameModel
+{
+    public int Level { get; set; }
 }
 
 public class JoinModel : PlayerIdModel
