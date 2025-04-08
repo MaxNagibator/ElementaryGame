@@ -4,14 +4,15 @@
 <div class="text-center main-container"
      style="">
     <div class="b-container">
-        <label id="TeamNumber">
-        </label>
-        <div id="TeamTitle">
-            <label id="TeamTitleName">
+        <div class="team-container">
+            <label id="TeamNumber">
             </label>
-            <image id="TeamTitleImage"
-                   style="width: 50px">
-            </image>
+            <div id="TeamTitle">
+                <label id="TeamTitleName">
+                </label>
+                <image id="TeamTitleImage">
+                </image>
+            </div>
         </div>
     </div>
     <div id="AdminButtons"
@@ -71,15 +72,20 @@
 
     <div id="page-3"
          class="game-page hidden">
-        <h2>Выбор уровня</h2>
-        <button class="btn btn-info level-btn" id="LevelBtn1"
-                onclick="fakeLevel(this, 1)">
-            Начальный
-        </button>
-        <button class="btn btn-info level-btn" id="LevelBtn2" disabled
-                onclick="fakeLevel(this, 2)">
-            Продвинутый
-        </button>
+        <div class="level-page b-container">
+            <h2>Выбор уровня</h2>
+            <button class="btn btn-info level-btn"
+                    id="LevelBtn1"
+                    onclick="fakeLevel(this, 1)">
+                Начальный
+            </button>
+            <button class="btn btn-info level-btn"
+                    id="LevelBtn2"
+                    disabled
+                    onclick="fakeLevel(this, 2)">
+                Продвинутый
+            </button>
+        </div>
     </div>
 
     <div id="page-4"

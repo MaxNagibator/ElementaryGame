@@ -346,13 +346,16 @@ var selectValueQuestion;
 function toSelectLevelPage(state) {
     prevStatText = null;
     selectValueQuestion = state.question;
-    if (state.player.answers.length > 0) {
+    if (state.level === 2) {
+        document.getElementById('LevelBtn1').disabled = true;
+        document.getElementById('LevelBtn2').disabled = false;
+    }
+    if (selectLevel === state.level || state.player.answers.length > 0) {
         selectLevel = state.level;
         toQuestionPage(state.question, state.answer);
-    }
-    if (selectLevel == null) {
+    } else if (selectLevel == null) {
         changePage(3);
-    } else if (state.player.answers1 != null && selectLevel == 1) {
+    } else if (state.player.answers1 != null && selectLevel === 1) {
         changePage(3);
     }
 }
@@ -421,7 +424,11 @@ function toQuestionPage(question, answer = null) {
             explanationContainer.classList.add('visible');
 
             const explanationImage = document.createElement('img');
-            explanationImage.src = `/images/explanations/q${question.id + 1}.png`;
+            if (selectLevel === 1) {
+                explanationImage.src = `/images/explanations-1/q${question.id + 1}.png`;
+            } else {
+                explanationImage.src = `/images/explanations-2/q${question.id + 1}.png`;
+            }
             explanationImage.className = 'explanation-image';
             explanationContainer.appendChild(explanationImage);
 
