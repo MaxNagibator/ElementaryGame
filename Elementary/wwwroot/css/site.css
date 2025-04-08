@@ -440,7 +440,7 @@ body {
     transition: transform 0.3s ease-out;
 }
 
-.options-table {
+.options-table-link {
     display: grid;
     align-items: start;
     margin-top: 20px;

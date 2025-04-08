@@ -80,7 +80,7 @@ function drawState() {
 
             let info = '';
             for (let i = 0; i < state.players.length; i++) {
-                info += "<div class='player-answer-count'>"+state.players[i].teamNumber + ": " + state.players[i].answers.length+"</div>";
+                info += "<div class='player-answer-count'>" + state.players[i].teamNumber + ": " + state.players[i].answers.length + "</div>";
             }
 
             let answerContainer = document.getElementById('AnswerBlock');
@@ -89,7 +89,7 @@ function drawState() {
 
             } else {
                 gameStatusDiv = document.createElement('div');
-                gameStatusDiv.id = 'GameStatus'
+                gameStatusDiv.id = 'GameStatus';
                 answerContainer.appendChild(gameStatusDiv);
             }
 
@@ -342,6 +342,7 @@ function loadQuestion() {
 }
 
 var selectValueQuestion;
+
 function toSelectLevelPage(state) {
     prevStatText = null;
     selectValueQuestion = state.question;
@@ -384,7 +385,7 @@ function toQuestionPage(question, answer = null) {
             .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
     }
 
-    if (answer) {        
+    if (answer) {
         if (currentAnswer !== answer.value) {
             currentAnswer = answer.value;
             const explanationContainer = document.getElementById('Explanation');
@@ -446,6 +447,7 @@ function toStatPage(state) {
 }
 
 var prevStatText = null;
+
 function renderStat(state) {
     let correct = 0;
     for (let i = 0; i < state.player.answers.length; i++) {
@@ -456,7 +458,7 @@ function renderStat(state) {
         if (correct < 3) {
             result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил...Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями».";
         } else if (correct < 5) {
-            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады.Внимательно их слушайте:)"
+            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады.Внимательно их слушайте:)";
         } else {
             result = "Великолепно! Кажется, что у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
         }
@@ -464,7 +466,7 @@ function renderStat(state) {
         if (correct < 3) {
             result = "Не беда! Но рекомендую полистать на досуге учебник по истории химии";
         } else if (correct < 5) {
-            result = "Неплохо!"
+            result = "Неплохо!";
         } else {
             result = "Моё почтение! Теперь я спокоен – есть на кого Россию оставить";
         }
@@ -487,7 +489,7 @@ function toAdminStatPage(players) {
         for (let i = 0; i < player.answers.length; i++) {
             correct += player.answers[i].isCorrect;
         }
-        html += "<div>" + player.teamNumber + " " + player.name +" " + correct + '/' + player.answers.length +"</div>";
+        html += "<div>" + player.teamNumber + " " + player.name + " " + correct + '/' + player.answers.length + "</div>";
     }
     document.getElementById('StatBlock').innerHTML = html;
     changePage(5);
@@ -512,28 +514,39 @@ function renderQuestion(question) {
             `).join('')}</div>`;
     } else if (question.type === 'link') {
         let abc = "ABC";
-        questionShow = `<div class="options-table ${qtype}">`;
+        questionShow = `<div class="options-table-link ${qtype}">`;
 
-        question.options.forEach((option, index) => {
-            questionShow += `
+        let divs = [];
+        question.options.forEach((option, index) =>
+            divs.push(`
             <div class="option-item" data-index="${index}">
               <span class="option-label">${abc[index]}</span>
               <span class="option-text">${option}</span>
             </div>
-          `;
-        });
+          `));
 
+        divs.push('<div></div>');
+
+        let divs2 = [];
         if (question.targetOptions) {
-            question.targetOptions.forEach((target, index) => {
-                questionShow += `
+            question.targetOptions.forEach((target, index) =>
+                divs2.push(`
                   <div class="target-option" data-index="${index}">
                     <span class="target-number">${index + 1}</span>
                     <span class="target-text">${target}</span>
                   </div>
-                `;
-            });
+                `));
         }
 
+        const result = divs.map((element, index) => [
+            element,
+            divs2[index],
+        ]);
+
+        result.forEach(div => {
+            questionShow += div[0];
+            questionShow += div[1];
+        });
         questionShow += '</div>';
 
         questionShow += `
