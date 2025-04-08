@@ -58,6 +58,7 @@ public class HomeController : Controller
             GameState = (int)GameValue.State,
             Player = player,
             Question = questionModel,
+            Answer = player?.GetAnswer(GameValue.CurrentQuestionId),
             Players = GameValue.State == Game.GameState.Started ? null : GameValue.Players,
             SectorValue = GameValue.SectorValue,
         });
@@ -107,6 +108,7 @@ public class HomeController : Controller
 
         return new()
         {
+            Id = GameValue.CurrentQuestionId,
             Text = question.Value,
             Options = options,
             Type = question.Options.Count > 0 ? "multiple" : "text",
@@ -115,6 +117,7 @@ public class HomeController : Controller
 
     public class QuestionModel
     {
+        public int Id { get; set; }
         public string Text { get; set; }
         public string[] Options { get; set; }
         public string Type { get; set; }

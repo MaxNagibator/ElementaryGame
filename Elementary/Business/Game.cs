@@ -34,12 +34,15 @@
                     Players[i].Answers.Add(new UserAnswer { IsCorrect = false, Value = null });
                 }
             }
+
             CurrentQuestionId++;
+
             if (CurrentQuestionId >= Questions.Count)
             {
                 State = GameState.Finish;
                 return null;
             }
+
             return Questions[CurrentQuestionId];
         }
 
@@ -56,6 +59,7 @@
             SectorValue = null;
 
             var freePlaces = new int[12];
+
             for (var i = 0; i < 12; i++)
             {
                 freePlaces[i] = i;
@@ -78,11 +82,14 @@
                 IsCorrect = string.Equals(Questions[CurrentQuestionId].Answer, value, StringComparison.InvariantCultureIgnoreCase),
                 Value = value,
             };
+
             var player = Players.First(x => x.Id == playerId);
+
             if (player.Answers.Count > CurrentQuestionId)
             {
                 throw new BusinessException("вы уже ответили");
             }
+
             player.Answers.Add(answer);
             return answer.IsCorrect;
         }
@@ -100,6 +107,7 @@
             }
 
             var number = FreePlaces[Players.Count];
+
             var player = new Player
             {
                 Id = playerId,
@@ -107,6 +115,7 @@
                 IsSingle = isSingle,
                 TeamNumber = Players.Count + 1
             };
+
             Players.Add(player);
         }
 
@@ -115,11 +124,13 @@
             State = GameState.WhellRun;
             var sectorValue = Random.Shared.Next(0, 12);
             SectorValue = sectorValue;
+
             for (var i = 0; i < Players.Count; i++)
             {
                 var myNumber = 12 - Players[i].PlaceNumber;
 
                 myNumber = myNumber + sectorValue;
+
                 if (myNumber >= 12)
                 {
                     // todo волшебная 12 в константы
@@ -134,6 +145,7 @@
                 {
                     Players[i].Name = PlayerConsts.TeamNames[myNumber];
                 }
+
                 Players[i].Descriptionn = PlayerConsts.Descriptions[myNumber];
                 Players[i].Image = (myNumber + 1) + ".png";
             }
@@ -151,5 +163,15 @@
         public bool IsSingle { get; set; }
 
         public List<UserAnswer> Answers { get; set; } = [];
+
+        public UserAnswer? GetAnswer(int questionId)
+        {
+            if (Answers.Count > 0 && questionId == Answers.Count - 1)
+            {
+                return Answers[questionId];
+            }
+
+            return null;
+        }
     }
 }
