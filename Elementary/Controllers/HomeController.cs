@@ -115,7 +115,7 @@ public class HomeController : Controller
             Id = GameValue.CurrentQuestionId,
             Text = question.Value,
             Options = options,
-            TargetOptions = question.TargetOptions.ToArray(),
+            TargetOptions = question.TargetOptions?.ToArray(),
             Type = question.Type,
         };
     }
@@ -126,7 +126,7 @@ public class HomeController : Controller
         public string Text { get; set; }
         public string[] Options { get; set; }
         public string Type { get; set; }
-        public string[] TargetOptions { get; set; }
+        public string[]? TargetOptions { get; set; }
     }
 
     [HttpPost]
@@ -139,7 +139,6 @@ public class HomeController : Controller
         {
             IsCorrect = isCorrect,
             currentQuestion.Answer,
-            currentQuestion.Explanation,
         });
     }
 

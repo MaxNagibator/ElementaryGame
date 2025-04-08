@@ -16,7 +16,7 @@ function init() {
     game.level = 1;
     if (window.location.search.includes('admin')) {
         isAdmin = true;
-        btns = document.getElementById('AdminButtons');
+        let btns = document.getElementById('AdminButtons');
         btns.classList.remove('hidden');
     }
 
@@ -360,6 +360,16 @@ function toQuestionPage(question, answer = null) {
                 });
             }
 
+            const confirmBtn = document.querySelector('.confirm-btn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Ответ принят';
+
+            if (inputs.length > 0) {
+                inputs.forEach(input => input.setAttribute('readonly', true));
+            } else if (optionBtns.length > 0) {
+                optionBtns.forEach(btn => btn.classList.add('disabled'));
+            }
+
             explanationContainer.classList.add('visible');
 
             const explanationImage = document.createElement('img');
@@ -428,14 +438,46 @@ function renderQuestion(question) {
                 <div class="option-btn">${o}</div>
             `).join('')}</div>`;
     } else if (question.type === 'link') {
-        questionShow += '<div class="options-table ' + qtype+ '">';
+        let abc = "ABC";
+        questionShow = `<div class="options-table ${qtype}">`;
+
+        question.options.forEach((option, index) => {
+            questionShow += `
+            <div class="option-item" data-index="${index}">
+              <span class="option-label">${abc[index]}</span>
+              <span class="option-text">${option}</span>
+            </div>
+          `;
+        });
+
+        if (question.targetOptions) {
+            question.targetOptions.forEach((target, index) => {
+                questionShow += `
+                  <div class="target-option" data-index="${index}">
+                    <span class="target-number">${index + 1}</span>
+                    <span class="target-text">${target}</span>
+                  </div>
+                `;
+            });
+        }
+
+        questionShow += '</div>';
+
+        questionShow += `
+          <div class="text-inputs-container">
+            ${Array.from({length: 3}, (_, i) => `
+              <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
+            `).join('')}
+          </div>
+        `;
+       /* questionShow += '<div class="options-table ' + qtype+ '">';
         for (let i = 0; i < question.options.length; i++) {
             questionShow += '<div class="option-btn">' + question.options[i] + '</div>'
         }
         for (let i = 0; i < question.targetOptions.length; i++) {
             questionShow += '<div class="target-option-btn">' + question.targetOptions[i] + '</div>'
         }
-        questionShow += '</div>';
+        questionShow += '</div>';*/
 
     } else {
         alert('всё сломалось');
@@ -467,7 +509,7 @@ function renderQuestion(question) {
     const inputs = document.querySelectorAll('.text-input');
     const optionBtns = document.querySelectorAll('.option-btn');
 
-    if (question.type === 'text') {
+    if (question.type === 'text' || question.type === 'link') {
         inputs.forEach((input, index) => {
             input.addEventListener('input', e => {
                 if (e.target.value.length === 1) {
@@ -504,11 +546,6 @@ function submitAnswer() {
     const inputs = document.querySelectorAll('.text-input');
     const selectedOption = document.querySelector('.option-btn.active');
     const confirmBtn = document.querySelector('.confirm-btn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Ответ принят';
-    if (!isAdmin) {
-        confirmBtn.classList.add('hidden');
-    }
 
     let answer;
 
@@ -528,19 +565,6 @@ function submitAnswer() {
             playerId,
         },
         success(data) {
-            const result = JSON.parse(data.responseText);
-            const isCorrect = answer === result.answer.toUpperCase();
-
-            if (inputs.length > 0) {
-                inputs.forEach(input => input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer'));
-            } else {
-                document.querySelectorAll('.option-btn').forEach(btn => {
-                    if (btn.innerText === result.answer) {
-                        btn.classList.add('correct-answer');
-                    }
-                });
-            }
-
             if (isAdmin) {
                 confirmBtn.textContent = 'Следующий вопрос';
                 confirmBtn.onclick = nextQuestion;
