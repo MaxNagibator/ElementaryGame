@@ -5,16 +5,15 @@
 @font-face {
     font-family: "Gordita";
     src: url("/fonts/Gordita-Regular.woff2") format("woff2"),
-    url("/fonts/Gordita-Regular.woff") format("woff"),
-    url("/fonts/Gordita-Regular.ttf") format("truetype");
+    url("/fonts/Gordita-Regular.ttf") format("opentype");
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: "Gordita";
-    src: url("/fonts/Gordita-Bold.woff2") format("woff2"),
-    url("/fonts/Gordita-Bold.woff") format("woff");
+    src: url("/fonts/Gordita-Bold.otf") format("opentype"),
+    url("/fonts/Gordita-Bold.woff2") format("woff2");
     font-weight: bold;
     font-style: normal;
 }
@@ -443,23 +442,23 @@ body {
 
 .options-table {
     display: grid;
+    align-items: start;
+    margin-top: 20px;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    margin-top: 20px;
-    align-items: start;
 }
 
-.option-label{
+.option-label {
     font-weight: bold;
 }
 
 .option-item {
     display: flex;
     align-items: center;
-    gap: 10px;
     padding: 8px;
-    border: 1px solid #ccc;
     cursor: pointer;
+    border: 1px solid #ccc;
+    gap: 10px;
 }
 
 .option-item:hover {
@@ -468,8 +467,8 @@ body {
 
 .target-option {
     display: flex;
-    flex-direction: row-reverse;
     align-items: center;
+    flex-direction: row-reverse;
     padding: 8px 12px;
     border: 1px dashed #666;
     background: #f9f9f9;
@@ -477,8 +476,8 @@ body {
 
 .target-number {
     font-weight: bold;
-    margin-right: 10px;
     min-width: 24px;
+    margin-right: 10px;
     text-align: right;
 }
 
@@ -492,7 +491,7 @@ body {
     font-weight: 800;
 }
 
-.stat-desc{
+.stat-desc {
     font-size: 20px;
 }
 

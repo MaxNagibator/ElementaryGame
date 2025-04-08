@@ -21,7 +21,7 @@
         public int CurrentQuestionId = -1;
 
         public List<Question> Questions { get; set; }
-        public List<Player> Players { get; set; } = new List<Player>();
+        public List<Player> Players { get; set; } = [];
         public List<int> FreePlaces { get; set; }
         public int? SectorValue { get; private set; }
 
