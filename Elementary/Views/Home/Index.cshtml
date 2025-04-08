@@ -5,39 +5,21 @@
 <script src="~/js/site.js"
         asp-append-version="true"></script>
 
-<div class="text-center"
-     style="display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-content: center;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 120px;
-">
-    @*<h1 class="display-4">Элементарно! (или не совсем)</h1>
-    <div>
-        <label>
-            Периодический закон и периодическая система Д. И. Менделеева. Электронный период в развитии химии.
-        </label>
-    </div>*@
-    <div>
+<div class="text-center main-container"
+     style="">
+    <div class="b-container">
         <label id="TeamNumber">
-
         </label>
         <div id="TeamTitle">
             <label id="TeamTitleName">
-
             </label>
-            <image id="TeamTitleImage" style="width: 50px">
-
+            <image id="TeamTitleImage"
+                   style="width: 50px">
             </image>
         </div>
     </div>
-    <div id="AdminButtons" class="hidden">
-@*         <button class="btn btn-info"
-                onclick="setSkin(1)">
-            выбрать скин
-        </button> *@
+    <div id="AdminButtons"
+         class="hidden">
         <button class="btn btn-success"
                 onclick="initGame()">
             инициализация
@@ -67,12 +49,18 @@
 
     <div id="page-2"
          class="game-page hidden">
-        <h2>Колесо фортуны</h2>
-        <div id="RuletkaHolder" style="position: relative; width: 250px; margin-top: 100px;margin-left: auto; margin-right: auto;">
-            <img id="ruletka"
-                 src="~/images/ruletka.png"
-                 style="width: 250px;    position: relative;
-    z-index: 122;" />
+        <div class="page-2-content">
+            <div id="SkinBlock"
+                 class="b-container card-container hidden">
+            </div>
+
+            <div class="b-container wheel-container">
+                <h2>Колесо фортуны</h2>
+                <div id="RuletkaHolder">
+                    <img id="ruletka"
+                         src="~/images/ruletka.png" />
+                </div>
+            </div>
         </div>
     </div>
 

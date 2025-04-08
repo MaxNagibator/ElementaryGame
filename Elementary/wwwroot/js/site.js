@@ -1,10 +1,11 @@
-﻿let currentPage = 1;
-let currentQuestionNumber = 1;
-let idCookieName = 'my-id'
-let playerId;
-let isAdmin; // todo чёто в game запихали, чёто тут, бардак!
-let isJoin;
-let spinWheelAnimationStop;
+﻿var currentPage = 1;
+var idCookieName = 'my-id';
+var playerId;
+var isAdmin; // todo чёто в game запихали, чёто тут, бардак!
+var isJoin;
+var spinWheelAnimationStop;
+var game = {};
+var state;
 
 setInterval(function () {
     getStatus();
@@ -29,30 +30,27 @@ function init() {
     getStatus();
 }
 
-let state;
+
 function getStatus() {
     SendRequest({
         method: 'POST',
         url: '/Home/GetState',
         body: {
-            playerId: playerId,
+            playerId,
         },
         success(data) {
             state = JSON.parse(data.responseText);
             drawState();
-        }
+        },
     });
 }
 
 function drawState() {
-    if (state.player) {
-        isJoin = true;
-    } else {
-        isJoin = false;
-    }
+    isJoin = !!state.player;
 
+    let players;
     if (state.players) {
-        players = []
+        players = [];
         for (var i = 0; i < state.players.length; i++) {
             let player = {
                 id: state.players[i].id,
@@ -62,26 +60,24 @@ function drawState() {
                 descriptionn: state.players[i].descriptionn,
                 image: state.players[i].image,
                 isSingle: state.players[i].isSingle,
-            }
+            };
             players.push(player);
         }
         game.players = players;
     }
 
-
     let status = {
         welcome: 0,
         whellrun: 1,
         started: 2,
-        finish: 3
+        finish: 3,
     };
 
     if (isAdmin) {
-        if (state.gameState == status.started) {
-            toQuestionPage(state.question);
+        if (state.gameState === status.started) {
+            toQuestionPage(state.question, state.answer);
         } else {
-
-            if (state.gameState == status.finish) {
+            if (state.gameState === status.finish) {
                 toAdminStatPage(state.players);
             } else {
                 // todo magic 2
@@ -90,25 +86,75 @@ function drawState() {
         }
     } else {
         let title = document.getElementById('TeamTitle');
-        if (state.player != null) {
-            document.getElementById('TeamNumber').innerHTML = "№" + (state.player.teamNumber)
-        }
-        if (state.player != null && state.player.name && spinWheelAnimationStop) {
+        let teamNumber = document.getElementById('TeamNumber');
 
-            title.classList.remove('hidden');
+        if (state.player != null) {
+            let text = "№" + state.player.teamNumber;
+
+            if (teamNumber.innerHTML !== text) {
+                teamNumber.innerHTML = text;
+            }
+        } else {
+            if (teamNumber.innerHTML !== "") {
+                teamNumber.innerHTML = "";
+            }
+        }
+
+        const skinBlock = document.getElementById('SkinBlock');
+
+        if (state.player != null && state.player.name && spinWheelAnimationStop) {
             let nameLabel = document.getElementById('TeamTitleName');
-            nameLabel.innerHTML = state.player.name;
-            let image = document.getElementById('TeamTitleImage');
-            image.src = "/images/skins/" + state.player.image;
+
+            if (state.player.name !== nameLabel.innerHTML) {
+                title.classList.remove('hidden');
+                nameLabel.innerHTML = state.player.name;
+                let image = document.getElementById('TeamTitleImage');
+                image.src = "/images/skins/" + state.player.image;
+            }
+
+            if (!skinBlock.querySelector('div')) {
+                const card = document.createElement('div');
+                card.className = 'player-card';
+
+                const img = new Image();
+                img.src = "/images/skins/" + state.player.image;
+                img.className = 'player-image';
+                img.alt = state.player.name;
+
+                const name = document.createElement('div');
+                name.className = 'player-name';
+                name.textContent = state.player.name;
+
+                const description = document.createElement('div');
+                description.className = 'player-description';
+                description.textContent = state.player.descriptionn;
+
+                card.appendChild(img);
+                card.appendChild(name);
+                card.appendChild(description);
+
+                card.style.opacity = 0;
+                setTimeout(() => card.style.opacity = 1, 50);
+
+                skinBlock.innerHTML = '';
+                skinBlock.style.animation = 'slideDown 0.5s ease-out';
+                skinBlock.classList.add('active');
+                skinBlock.classList.remove('hidden');
+                skinBlock.appendChild(card);
+            }
+
             if (state.question) {
-                toQuestionPage(state.question);
+                toQuestionPage(state.question, state.answer);
             } else {
-                if (state.gameState == status.finish) {
+                if (state.gameState === status.finish) {
                     toStatPage(state.player);
                 }
             }
         } else {
             title.classList.add('hidden');
+            skinBlock.classList.remove('active');
+            skinBlock.classList.add('hidden');
+            skinBlock.innerHTML = '';
             if (isJoin) {
                 changePage(2);
             } else {
@@ -117,14 +163,14 @@ function drawState() {
         }
     }
 
-    if (currentPage == 2) {
+    if (currentPage === 2) {
         if (game.sectorValue == null && state.sectorValue != null) {
             game.sectorValue = state.sectorValue;
             spinWheelAnimation(game.sectorValue);
         }
 
         if (game.players) {
-            if (game.prevDrawPlayersLength != game.players.length) {
+            if (game.prevDrawPlayersLength !== game.players.length) {
                 // todo ебучая этажерка
                 game.prevDrawPlayersLength = game.players.length;
 
@@ -141,9 +187,9 @@ function drawState() {
                     let isPlaceBusy = false;
                     let number;
                     for (let j = 0; j < game.players.length; j++) {
-                        if (i == game.players[j].placeNumber) {
+                        if (i === game.players[j].placeNumber) {
                             isPlaceBusy = true;
-                            number = game.players[j].teamNumber
+                            number = game.players[j].teamNumber;
                             break;
                         }
                     }
@@ -152,7 +198,7 @@ function drawState() {
                         continue;
                     }
 
-                    const angle = (i * (2 * Math.PI / 12)) - Math.PI / 2;
+                    const angle = i * (2 * Math.PI / 12) - Math.PI / 2;
 
                     const x = centerX + radius * Math.cos(angle);
                     const y = centerY + radius * Math.sin(angle);
@@ -168,11 +214,13 @@ function drawState() {
                 }
             }
         }
+    } else {
+        game.prevDrawPlayersLength = 0;
     }
 }
 
 function changePage(page) {
-    if (currentPage == page) {
+    if (currentPage === page) {
         // отключить мерцание
         return;
     }
@@ -191,15 +239,14 @@ function refreshPage() {
     }
 }
 
-game = {};
 
 function setMode(val) {
     SendRequest({
         method: 'POST',
         url: '/Home/Join',
         body: {
-            playerId: playerId,
-            isAdmin: isAdmin,
+            playerId,
+            isAdmin,
             isSingle: val,
         },
         success(data) {
@@ -210,7 +257,7 @@ function setMode(val) {
             isJoin = true;
             game.sectorValue = null;
             changePage(2);
-        }
+        },
     });
 }
 
@@ -228,27 +275,24 @@ function initGame() {
     SendRequest({
         method: 'POST',
         url: '/Home/InitGame',
-        body: {
-        },
+        body: {},
         success(data) {
-            currentQuestionNumber = 1;
             spinWheelAnimationStop = false;
             var ruletkaDiv = document.getElementById('ruletka');
             ruletkaDiv.style.transition = "";
             ruletkaDiv.style.transform = "";
             game.sectorValue = null;
-        }
+        },
     });
 }
+
 function startGame() {
     SendRequest({
         method: 'POST',
         url: '/Home/StartGame',
-        body: {
-        },
+        body: {},
         success(data) {
-            currentQuestionNumber = 1;
-        }
+        },
     });
 }
 
@@ -258,20 +302,6 @@ function nextQuestion() {
         confirmBtn.remove();
     }
 
-    const explanationContainer = document.getElementById('Explanation');
-    explanationContainer.classList.remove('visible');
-    explanationContainer.innerHTML = '';
-
-    document.querySelectorAll('.text-input').forEach(input => {
-        input.value = '';
-        input.removeAttribute('readonly');
-        input.classList.remove('correct-answer', 'wrong-answer');
-    });
-
-    document.querySelectorAll('.option-btn')
-        .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
-
-    currentQuestionNumber++;
     loadQuestion();
 }
 
@@ -280,22 +310,81 @@ function loadQuestion() {
         method: 'POST',
         url: '/Home/GetNextQuestion',
         body: {
-            questionNumber: currentQuestionNumber,
-            level: game.level
+            level: game.level,
         },
         success(data) {
             const question = JSON.parse(data.responseText);
             if (question) {
                 toQuestionPage(question);
             }
-        }
+        },
     });
 }
 
-function toQuestionPage(question) {
-    renderQuestion(question);
+function toQuestionPage(question, answer = null) {
+    if (currentQuestion !== question.text) {
+        currentQuestion = question.text;
+        renderQuestion(question);
+
+        const explanationContainer = document.getElementById('Explanation');
+
+        explanationContainer.classList.remove('visible');
+        explanationContainer.innerHTML = '';
+
+        document.querySelectorAll('.text-input').forEach(input => {
+            input.value = '';
+            input.removeAttribute('readonly');
+            input.classList.remove('correct-answer', 'wrong-answer');
+        });
+
+        document.querySelectorAll('.option-btn')
+            .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
+    }
+
+    if (answer) {
+        if (currentAnswer !== answer.value) {
+            currentAnswer = answer.value;
+
+            const explanationContainer = document.getElementById('Explanation');
+
+            const isCorrect = answer.isCorrect;
+
+            const inputs = document.querySelectorAll('.text-input');
+            const optionBtns = document.querySelectorAll('.option-btn');
+
+            if (inputs.length > 0) {
+                inputs.forEach(input => input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer'));
+            } else {
+                optionBtns.forEach(btn => {
+                    if (btn.innerText === answer.value) {
+                        btn.classList.add('correct-answer');
+                    }
+                });
+            }
+
+            explanationContainer.classList.add('visible');
+
+            const explanationImage = document.createElement('img');
+            explanationImage.src = `/images/explanations/q${question.id + 1}.png`;
+            explanationImage.className = 'explanation-image';
+            explanationContainer.appendChild(explanationImage);
+
+            setTimeout(() => {
+                const rect = explanationContainer.getBoundingClientRect();
+                if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                    explanationContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'nearest',
+                    });
+                }
+            }, 100);
+        }
+    }
+
     changePage(4);
 }
+
 function toStatPage(player) {
     renderStat(player);
     changePage(5);
@@ -319,31 +408,28 @@ function toAdminStatPage(players) {
         }
         html += correct + '/' + player.answers.length;
     }
-    document.getElementById('StatBlock').innerHTML = html
+    document.getElementById('StatBlock').innerHTML = html;
+    changePage(5);
 }
 
-let currentQuestion = null;
+var currentQuestion = null;
+var currentAnswer = null;
 
 function renderQuestion(question) {
-    if (currentQuestion == question.text) {
-        return;
-    }
-    currentQuestion = question.text;
-
     const block = document.getElementById('QuestionBlock');
     block.innerHTML = `
-        <h3>Вопрос ${currentQuestionNumber}</h3>
+        <h3>Вопрос ${question.id + 1}</h3>
         <div class="question-text">${question.text}</div>
         ${question.type === 'text' ?
-            `<div class="text-inputs-container">
+        `<div class="text-inputs-container">
             ${Array.from({ length: 4 }, (_, i) => `
             <input type="text" class="text-input" maxlength="1" data-index="${i}">
         `).join('')}
         </div>` :
-            `<div class="options-table">${question.options.map(o => `
+        `<div class="options-table">${question.options.map(o => `
                 <div class="option-btn">${o}</div>
             `).join('')}</div>`
-        }
+    }
     `;
 
     const answerContainer = document.getElementById('AnswerBlock');
@@ -363,7 +449,6 @@ function renderQuestion(question) {
     confirmBtn.disabled = true;
     confirmBtn.onclick = submitAnswer;
     answerContainer.appendChild(confirmBtn);
-
 
     const inputs = document.querySelectorAll('.text-input');
     const optionBtns = document.querySelectorAll('.option-btn');
@@ -426,7 +511,7 @@ function submitAnswer() {
         url: '/Home/SetAnswer',
         body: {
             value: answer,
-            playerId: playerId,
+            playerId,
         },
         success(data) {
             const result = JSON.parse(data.responseText);
@@ -442,69 +527,45 @@ function submitAnswer() {
                 });
             }
 
-            if (result.imageUrl) {
-                const explanationContainer = document.getElementById('Explanation');
-                explanationContainer.classList.add('visible');
-
-                const explanationImage = document.createElement('img');
-                explanationImage.src = `/images/explanations/q${currentQuestionNumber}.png`;
-                explanationImage.className = 'explanation-image';
-                explanationContainer.appendChild(explanationImage);
-
-                setTimeout(() => {
-                    const rect = explanationContainer.getBoundingClientRect();
-                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
-                        explanationContainer.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                            inline: 'nearest'
-                        });
-                    }
-                }, 150);
-            }
-
-            setTimeout(() => {
+            if (isAdmin) {
                 confirmBtn.textContent = 'Следующий вопрос';
                 confirmBtn.onclick = nextQuestion;
                 confirmBtn.disabled = false;
-            }, 500);
-        }
+            }
+        },
     });
 }
 
 document.addEventListener('DOMContentLoaded', init);
 
-var currentAngle = 0;
 function spinWheel() {
     SendRequest({
         method: 'POST',
         url: '/Home/SpinWhell',
-        body: {
-        },
+        body: {},
         success(data) {
             //const result = JSON.parse(data.responseText);
             //spinWheelAnimation(result.sectorValue);
-        }
+        },
     });
 }
 
 function spinWheelAnimation(sectorValue) {
-    console.log(sectorValue);
     //const sectorValue = getRandomInt(1, 12);
     // 360 градусов это 12 сектаров, значит 1 сектор это 360 / 12 = 30 градусов
     const sector = 30;
 
-    var ruletkaDiv = document.getElementById('ruletka');
+    let ruletkaDiv = document.getElementById('ruletka');
 
-    var rounds = getRandomInt(2, 5);
+    let rounds = getRandomInt(2, 5);
     const time = getRandomInt(3, 8);
-    var angle = rounds * 360 + sectorValue * sector;
+    let angle = rounds * 360 + sectorValue * sector;
     ruletkaDiv.style.transition = `transform ${time}s cubic-bezier(0.1, 0.7, 0.1, 1)`;
     ruletkaDiv.style.transform = `rotate(${angle}deg)`;
     setTimeout(function () {
         spinWheelAnimationStop = true;
         drawState();
-    }, ((time + 1) * 1000));
+    }, (time + 1) * 1000);
 }
 
 function getRandomInt(min, max) {
@@ -589,7 +650,7 @@ function hideAlert(elem) {
 
 function uuidv4() {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
-        (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+        (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16),
     );
 }
 

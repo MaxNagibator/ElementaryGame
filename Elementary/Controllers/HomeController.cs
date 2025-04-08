@@ -1,8 +1,7 @@
-using Elementary.Business;
+ï»¿using Elementary.Business;
 using Elementary.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace Elementary.Controllers;
 
@@ -26,7 +25,7 @@ public class HomeController : Controller
     {
         if (model.IsAdmin)
         {
-            // à íàõåð íå íàäî, íà ôðîíòå âñ¸ ðàñêèäàåì
+            // Ð° Ð½Ð°Ñ…ÐµÑ€ Ð½Ðµ Ð½Ð°Ð´Ð¾, Ð½Ð° Ñ„Ñ€Ð¾Ð½Ñ‚Ðµ Ð²ÑÑ‘ Ñ€Ð°ÑÐºÐ¸Ð´Ð°ÐµÐ¼
             GameValue.AdminId = model.PlayerId;
         }
         else
@@ -47,6 +46,7 @@ public class HomeController : Controller
     {
         var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
         QuestionModel? questionModel = null;
+
         if (GameValue.State == Game.GameState.Started)
         {
             var question = GameValue.GetCurrentQuestion();
@@ -58,6 +58,7 @@ public class HomeController : Controller
             GameState = (int)GameValue.State,
             Player = player,
             Question = questionModel,
+            Answer = player?.GetAnswer(GameValue.CurrentQuestionId),
             Players = GameValue.State == Game.GameState.Started ? null : GameValue.Players,
             SectorValue = GameValue.SectorValue,
         });
@@ -81,9 +82,10 @@ public class HomeController : Controller
     public JsonResult SpinWhell()
     {
         GameValue.SpinWhell();
+
         return new(new
         {
-            SectorValue = GameValue.SectorValue,
+            GameValue.SectorValue,
         });
     }
 
@@ -94,17 +96,19 @@ public class HomeController : Controller
         return new(GetQuestionModel(question));
     }
 
-    private QuestionModel? GetQuestionModel(Question question)
+    private QuestionModel? GetQuestionModel(Question? question)
     {
-        if(question == null)
+        if (question == null)
         {
             return null;
         }
+
         var options = question.Options.ToArray();
         Random.Shared.Shuffle(options);
 
-        return new QuestionModel
+        return new()
         {
+            Id = GameValue.CurrentQuestionId,
             Text = question.Value,
             Options = options,
             Type = question.Options.Count > 0 ? "multiple" : "text",
@@ -113,6 +117,7 @@ public class HomeController : Controller
 
     public class QuestionModel
     {
+        public int Id { get; set; }
         public string Text { get; set; }
         public string[] Options { get; set; }
         public string Type { get; set; }
