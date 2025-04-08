@@ -439,11 +439,37 @@ function renderQuestion(question) {
             `).join('')}</div>`;
     } else if (question.type === 'link') {
         let abc = "ABC";
-        questionShow = `<div class="text-inputs-container">
-            ${Array.from({ length: 3 }, (_, i) => `
-            <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
-        `).join('')}
-        </div>`;
+        questionShow = `<div class="options-table ${qtype}">`;
+
+        question.options.forEach((option, index) => {
+            questionShow += `
+            <div class="option-item" data-index="${index}">
+              <span class="option-label">${abc[index]}</span>
+              <span class="option-text">${option}</span>
+            </div>
+          `;
+        });
+
+        if (question.targetOptions) {
+            question.targetOptions.forEach((target, index) => {
+                questionShow += `
+                  <div class="target-option" data-index="${index}">
+                    <span class="target-number">${index + 1}</span>
+                    <span class="target-text">${target}</span>
+                  </div>
+                `;
+            });
+        }
+
+        questionShow += '</div>';
+
+        questionShow += `
+          <div class="text-inputs-container">
+            ${Array.from({length: 3}, (_, i) => `
+              <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
+            `).join('')}
+          </div>
+        `;
        /* questionShow += '<div class="options-table ' + qtype+ '">';
         for (let i = 0; i < question.options.length; i++) {
             questionShow += '<div class="option-btn">' + question.options[i] + '</div>'
