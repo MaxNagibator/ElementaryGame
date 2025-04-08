@@ -486,3 +486,25 @@ body {
     flex: 1;
     text-align: right;
 }
+
+.stat-label {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.stat-desc{
+    font-size: 20px;
+}
+
+.player-answer-count {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#StatBlock {
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: var(--white);
+}

@@ -16,6 +16,7 @@
         }
 
         public GameState State { get; set; }
+        public int Level { get; private set; }
 
         public int CurrentQuestionId = -1;
 
@@ -23,7 +24,6 @@
         public List<Player> Players { get; set; } = new List<Player>();
         public List<int> FreePlaces { get; set; }
         public int? SectorValue { get; private set; }
-        public Guid AdminId { get; internal set; }
 
         public Question? GetNextQuestion()
         {
@@ -40,15 +40,16 @@
             if (CurrentQuestionId >= Questions.Count)
             {
                 State = GameState.Finish;
+                CurrentQuestionId = -1;
                 return null;
             }
 
             return Questions[CurrentQuestionId];
         }
 
-        public Question GetCurrentQuestion()
+        public Question? GetCurrentQuestion()
         {
-            return Questions[CurrentQuestionId];
+            return CurrentQuestionId == -1 || CurrentQuestionId > Questions.Count ? null :  Questions[CurrentQuestionId];
         }
 
         public void InitGame()
@@ -67,13 +68,41 @@
 
             Random.Shared.Shuffle(freePlaces);
             FreePlaces = freePlaces.ToList();
+            Level = 0;
         }
 
         public void StartGame(int level)
         {
+            if (Players.Count == 0)
+            {
+                throw new BusinessException("нет игроков");
+            }
+            if (Players[0].Name == null)
+            {
+                throw new BusinessException("крути рулетку");
+            }
+            if (level == 2 && State != GameState.Finish)
+            {
+                throw new BusinessException("сначала уровень простой сыграйте");
+            }
+
+            if (Level == 1 && level == 1)
+            {
+                throw new BusinessException("уже начато");
+            }
+
             CurrentQuestionId = 0;
             Questions = QuestionHolder.GetQuestions(level);
             State = GameState.Started;
+            Level = level;
+            if (level == 2)
+            {
+                for (int i = 0; i < Players.Count; i++)
+                {
+                    Players[i].Answers1 = Players[i].Answers;
+                    Players[i].Answers = new List<UserAnswer>();
+                }
+            }
         }
 
         public bool SetAnswer(Guid playerId, string value)
@@ -164,6 +193,7 @@
         public bool IsSingle { get; set; }
 
         public List<UserAnswer> Answers { get; set; } = [];
+        public List<UserAnswer> Answers1 { get; set; }
 
         public UserAnswer? GetAnswer(int questionId)
         {

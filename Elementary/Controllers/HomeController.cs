@@ -23,43 +23,47 @@ public class HomeController : Controller
     [HttpPost]
     public JsonResult Join([FromBody] JoinModel model)
     {
-        if (model.IsAdmin)
+        GameValue.Join(model.PlayerId, model.IsSingle);
+        if(false)
         {
-            // а нахер не надо, на фронте всё раскидаем
-            GameValue.AdminId = model.PlayerId;
+            for(int i = 0;i < 11; i++)
+            {
+                GameValue.Join(Guid.NewGuid(), model.IsSingle);
+            }
         }
-        else
-        {
-            GameValue.Join(model.PlayerId, model.IsSingle);
-        }
-
-        return GetStateInternal(model.PlayerId);
+        
+        return GetStateInternal(model.PlayerId, false);
     }
 
     [HttpPost]
     public JsonResult GetState([FromBody] PlayerIdModel model)
     {
-        return GetStateInternal(model.PlayerId);
+        return GetStateInternal(model.PlayerId, model.IsAdmin);
     }
 
-    private JsonResult GetStateInternal(Guid playerId)
+    private JsonResult GetStateInternal(Guid playerId, bool isAdmin)
     {
         var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
         QuestionModel? questionModel = null;
 
+        var question = GameValue.GetCurrentQuestion();
         if (GameValue.State == Game.GameState.Started)
         {
-            var question = GameValue.GetCurrentQuestion();
             questionModel = GetQuestionModel(question);
         }
+
+        var answer = player?.GetAnswer(GameValue.CurrentQuestionId);
 
         return new(new
         {
             GameState = (int)GameValue.State,
+            Level = GameValue.Level,
             Player = player,
             Question = questionModel,
-            Answer = player?.GetAnswer(GameValue.CurrentQuestionId),
-            Players = GameValue.State == Game.GameState.Started ? null : GameValue.Players,
+            Answer = answer,
+            CorrectAnswer = answer == null ? null : question?.Answer,
+
+            Players = GameValue.State != Game.GameState.Started || isAdmin ? GameValue.Players : null,
             SectorValue = GameValue.SectorValue,
         });
     }
@@ -157,6 +161,7 @@ public class SetAnswerModel : PlayerIdModel
 public class PlayerIdModel
 {
     public Guid PlayerId { get; set; }
+    public bool IsAdmin { get; set; }
 }
 
 public class StartGameModel

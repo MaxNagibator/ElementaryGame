@@ -6,6 +6,7 @@ var isJoin;
 var spinWheelAnimationStop;
 var game = {};
 var state;
+var selectLevel = null;
 
 setInterval(function () {
     getStatus();
@@ -37,6 +38,7 @@ function getStatus() {
         url: '/Home/GetState',
         body: {
             playerId,
+            isAdmin,
         },
         success(data) {
             state = JSON.parse(data.responseText);
@@ -75,7 +77,25 @@ function drawState() {
 
     if (isAdmin) {
         if (state.gameState === status.started) {
+
+            let info = '';
+            for (let i = 0; i < state.players.length; i++) {
+                info += "<div class='player-answer-count'>"+state.players[i].teamNumber + ": " + state.players[i].answers.length+"</div>";
+            }
+
+            let answerContainer = document.getElementById('AnswerBlock');
+            let gameStatusDiv = document.getElementById('GameStatus');
+            if (gameStatusDiv) {
+
+            } else {
+                gameStatusDiv = document.createElement('div');
+                gameStatusDiv.id = 'GameStatus'
+                answerContainer.appendChild(gameStatusDiv);
+            }
+
+            gameStatusDiv.innerHTML = info;
             toQuestionPage(state.question, state.answer);
+
         } else {
             if (state.gameState === status.finish) {
                 toAdminStatPage(state.players);
@@ -144,10 +164,10 @@ function drawState() {
             }
 
             if (state.question) {
-                toQuestionPage(state.question, state.answer);
+                toSelectLevelPage(state);
             } else {
                 if (state.gameState === status.finish) {
-                    toStatPage(state.player);
+                    toStatPage(state);
                 }
             }
         } else {
@@ -239,7 +259,6 @@ function refreshPage() {
     }
 }
 
-
 function setMode(val) {
     SendRequest({
         method: 'POST',
@@ -256,6 +275,9 @@ function setMode(val) {
             ruletkaDiv.style.transform = "";
             isJoin = true;
             game.sectorValue = null;
+            selectLevel = null;
+            document.getElementById('LevelBtn1').disabled = false;
+            document.getElementById('LevelBtn2').disabled = true;
             changePage(2);
         },
     });
@@ -319,8 +341,31 @@ function loadQuestion() {
     });
 }
 
+var selectValueQuestion;
+function toSelectLevelPage(state) {
+    prevStatText = null;
+    selectValueQuestion = state.question;
+    if (state.player.answers.length > 0) {
+        selectLevel = state.level;
+        toQuestionPage(state.question, state.answer);
+    }
+    if (selectLevel == null) {
+        changePage(3);
+    } else if (state.player.answers1 != null && selectLevel == 1) {
+        changePage(3);
+    }
+}
+
+function fakeLevel(elem, level) {
+    selectLevel = level;
+    toQuestionPage(selectValueQuestion);
+    document.getElementById('LevelBtn1').disabled = true;
+    document.getElementById('LevelBtn2').disabled = false;
+}
+
 function toQuestionPage(question, answer = null) {
     if (currentQuestion !== question.text) {
+        currentAnswer = null;
         currentQuestion = question.text;
         renderQuestion(question);
 
@@ -339,10 +384,9 @@ function toQuestionPage(question, answer = null) {
             .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
     }
 
-    if (answer) {
+    if (answer) {        
         if (currentAnswer !== answer.value) {
             currentAnswer = answer.value;
-
             const explanationContainer = document.getElementById('Explanation');
 
             const isCorrect = answer.isCorrect;
@@ -354,8 +398,11 @@ function toQuestionPage(question, answer = null) {
                 inputs.forEach(input => input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer'));
             } else {
                 optionBtns.forEach(btn => {
-                    if (btn.innerText === answer.value) {
+                    if (btn.innerText === state.correctAnswer) {
                         btn.classList.add('correct-answer');
+                    }
+                    if (btn.innerText === answer.value) {
+                        btn.classList.add('active');
                     }
                 });
             }
@@ -393,17 +440,43 @@ function toQuestionPage(question, answer = null) {
     changePage(4);
 }
 
-function toStatPage(player) {
-    renderStat(player);
+function toStatPage(state) {
+    renderStat(state);
     changePage(5);
 }
 
-function renderStat(player) {
+var prevStatText = null;
+function renderStat(state) {
     let correct = 0;
-    for (let i = 0; i < player.answers.length; i++) {
-        correct += player.answers[i].isCorrect;
+    for (let i = 0; i < state.player.answers.length; i++) {
+        correct += state.player.answers[i].isCorrect;
     }
-    document.getElementById('StatBlock').innerHTML = correct + '/' + player.answers.length;
+    let result;
+    if (state.level == 1) {
+        if (correct < 3) {
+            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил...Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями».";
+        } else if (correct < 5) {
+            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады.Внимательно их слушайте:)"
+        } else {
+            result = "Великолепно! Кажется, что у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
+        }
+    } else {
+        if (correct < 3) {
+            result = "Не беда! Но рекомендую полистать на досуге учебник по истории химии";
+        } else if (correct < 5) {
+            result = "Неплохо!"
+        } else {
+            result = "Моё почтение! Теперь я спокоен – есть на кого Россию оставить";
+        }
+    }
+    let text = "<div>"
+        + "<label class='stat-label'>" + correct + '/' + state.player.answers.length + "</label>"
+        + "<label class='stat-desc'>" + result + "</label>"
+        + "</div>";
+    if (prevStatText != text) {
+        document.getElementById('StatBlock').innerHTML = text;
+        prevStatText = text;
+    }
 }
 
 function toAdminStatPage(players) {
@@ -414,7 +487,7 @@ function toAdminStatPage(players) {
         for (let i = 0; i < player.answers.length; i++) {
             correct += player.answers[i].isCorrect;
         }
-        html += correct + '/' + player.answers.length;
+        html += "<div>" + player.teamNumber + " " + player.name +" " + correct + '/' + player.answers.length +"</div>";
     }
     document.getElementById('StatBlock').innerHTML = html;
     changePage(5);
@@ -465,20 +538,11 @@ function renderQuestion(question) {
 
         questionShow += `
           <div class="text-inputs-container">
-            ${Array.from({length: 3}, (_, i) => `
+            ${Array.from({ length: 3 }, (_, i) => `
               <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
             `).join('')}
           </div>
         `;
-       /* questionShow += '<div class="options-table ' + qtype+ '">';
-        for (let i = 0; i < question.options.length; i++) {
-            questionShow += '<div class="option-btn">' + question.options[i] + '</div>'
-        }
-        for (let i = 0; i < question.targetOptions.length; i++) {
-            questionShow += '<div class="target-option-btn">' + question.targetOptions[i] + '</div>'
-        }
-        questionShow += '</div>';*/
-
     } else {
         alert('всё сломалось');
     }
