@@ -16,7 +16,7 @@ function init() {
     game.level = 1;
     if (window.location.search.includes('admin')) {
         isAdmin = true;
-        btns = document.getElementById('AdminButtons');
+        let btns = document.getElementById('AdminButtons');
         btns.classList.remove('hidden');
     }
 
@@ -438,14 +438,20 @@ function renderQuestion(question) {
                 <div class="option-btn">${o}</div>
             `).join('')}</div>`;
     } else if (question.type === 'link') {
-        questionShow += '<div class="options-table ' + qtype+ '">';
+        let abc = "ABC";
+        questionShow = `<div class="text-inputs-container">
+            ${Array.from({ length: 3 }, (_, i) => `
+            <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
+        `).join('')}
+        </div>`;
+       /* questionShow += '<div class="options-table ' + qtype+ '">';
         for (let i = 0; i < question.options.length; i++) {
             questionShow += '<div class="option-btn">' + question.options[i] + '</div>'
         }
         for (let i = 0; i < question.targetOptions.length; i++) {
             questionShow += '<div class="target-option-btn">' + question.targetOptions[i] + '</div>'
         }
-        questionShow += '</div>';
+        questionShow += '</div>';*/
 
     } else {
         alert('всё сломалось');
@@ -477,7 +483,7 @@ function renderQuestion(question) {
     const inputs = document.querySelectorAll('.text-input');
     const optionBtns = document.querySelectorAll('.option-btn');
 
-    if (question.type === 'text') {
+    if (question.type === 'text' || question.type === 'link') {
         inputs.forEach((input, index) => {
             input.addEventListener('input', e => {
                 if (e.target.value.length === 1) {
@@ -514,11 +520,6 @@ function submitAnswer() {
     const inputs = document.querySelectorAll('.text-input');
     const selectedOption = document.querySelector('.option-btn.active');
     const confirmBtn = document.querySelector('.confirm-btn');
-/*    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Ответ принят';*/
-/*    if (!isAdmin) {
-        confirmBtn.classList.add('hidden');
-    }*/
 
     let answer;
 

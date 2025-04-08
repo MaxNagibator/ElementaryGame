@@ -138,7 +138,7 @@ public class QuestionHolder
                     "Бор",
                     "Скандий",
                 ],
-                Answer = "А–2,Б–4,В–1",
+                Answer = "241",
             },
         ];
     }
