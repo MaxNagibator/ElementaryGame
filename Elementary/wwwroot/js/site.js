@@ -360,6 +360,16 @@ function toQuestionPage(question, answer = null) {
                 });
             }
 
+            const confirmBtn = document.querySelector('.confirm-btn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Ответ принят';
+
+            if (inputs.length > 0) {
+                inputs.forEach(input => input.setAttribute('readonly', true));
+            } else if (optionBtns.length > 0) {
+                optionBtns.forEach(btn => btn.classList.add('disabled'));
+            }
+
             explanationContainer.classList.add('visible');
 
             const explanationImage = document.createElement('img');
@@ -504,11 +514,11 @@ function submitAnswer() {
     const inputs = document.querySelectorAll('.text-input');
     const selectedOption = document.querySelector('.option-btn.active');
     const confirmBtn = document.querySelector('.confirm-btn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Ответ принят';
-    if (!isAdmin) {
+/*    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Ответ принят';*/
+/*    if (!isAdmin) {
         confirmBtn.classList.add('hidden');
-    }
+    }*/
 
     let answer;
 
@@ -528,19 +538,6 @@ function submitAnswer() {
             playerId,
         },
         success(data) {
-            const result = JSON.parse(data.responseText);
-            const isCorrect = answer === result.answer.toUpperCase();
-
-            if (inputs.length > 0) {
-                inputs.forEach(input => input.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer'));
-            } else {
-                document.querySelectorAll('.option-btn').forEach(btn => {
-                    if (btn.innerText === result.answer) {
-                        btn.classList.add('correct-answer');
-                    }
-                });
-            }
-
             if (isAdmin) {
                 confirmBtn.textContent = 'Следующий вопрос';
                 confirmBtn.onclick = nextQuestion;
