@@ -102,6 +102,8 @@ function drawState() {
             }
         }
 
+        const skinBlock = document.getElementById('SkinBlock');
+
         if (state.player != null && state.player.name && spinWheelAnimationStop) {
             let nameLabel = document.getElementById('TeamTitleName');
 
@@ -112,11 +114,8 @@ function drawState() {
                 image.src = "/images/skins/" + state.player.image;
             }
 
-            const skinBlock = document.getElementById('SkinBlock');
 
             if (!skinBlock.querySelector('div')) {
-                skinBlock.classList.remove('hidden');
-
                 const card = document.createElement('div');
                 card.className = 'player-card';
 
@@ -141,6 +140,9 @@ function drawState() {
                 setTimeout(() => card.style.opacity = 1, 50);
 
                 skinBlock.innerHTML = '';
+                skinBlock.style.animation = 'slideDown 0.5s ease-out';
+                skinBlock.classList.add('active');
+                skinBlock.classList.remove('hidden');
                 skinBlock.appendChild(card);
             }
 
@@ -153,6 +155,9 @@ function drawState() {
             }
         } else {
             title.classList.add('hidden');
+            skinBlock.classList.remove('active');
+            skinBlock.classList.add('hidden');
+            skinBlock.innerHTML = '';
             if (isJoin) {
                 changePage(2);
             } else {

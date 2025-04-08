@@ -1,5 +1,5 @@
 :root {
-    --white: rgba(255, 255, 255, 0.88);
+    --white: rgb(255 255 255 / 90%);
 }
 
 @font-face {
@@ -342,9 +342,24 @@ body {
 .player-image {
     width: 200px;
     margin: auto 10px;
-    animation: float 3s ease-in-out infinite;
-    border: 3px solid #2c3e50;
+    animation: float 3s ease-in-out infinite,
+    pulse-border 2.5s linear infinite;
     border-radius: 50%;
+}
+
+@keyframes pulse-border {
+    0% {
+        border-color: #2c3e50;
+        box-shadow: 0 0 0 0 rgba(44, 62, 80, 0.3);
+    }
+    50% {
+        border-color: #3498db;
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+    }
+    100% {
+        border-color: #2c3e50;
+        box-shadow: 0 0 0 0 rgba(44, 62, 80, 0);
+    }
 }
 
 @keyframes float {
@@ -358,12 +373,57 @@ body {
 
 .player-name {
     font-size: 24px;
+    font-weight: bold;
     margin: 15px 0;
     text-align: center;
-    font-weight: bold;
 }
 
 .player-description {
     font-size: 18px;
     text-align: center;
+}
+
+.page-2-content {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#SkinBlock {
+    transition: max-height 0.5s ease-out,
+    opacity 0.3s ease-out 0.2s,
+    transform 0.3s ease-out 0.2s;
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+#SkinBlock.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.wheel-container {
+    transition: transform 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+#RuletkaHolder {
+    position: relative;
+    width: 250px;
+    margin: 40px auto;
+}
+
+#ruletka {
+    position: relative;
+    z-index: 122;
+    width: 100%;
+    transition: transform 0.3s ease-out;
 }
