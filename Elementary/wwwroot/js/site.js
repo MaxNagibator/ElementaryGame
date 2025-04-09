@@ -430,14 +430,11 @@ function toQuestionPage(question, answer = null) {
             explanationContainer.appendChild(explanationImage);
 
             setTimeout(() => {
-                const rect = explanationContainer.getBoundingClientRect();
-                if (rect.top < 0 || rect.bottom > window.innerHeight) {
-                    explanationContainer.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                        inline: 'nearest',
-                    });
-                }
+                explanationContainer.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center',
+                });
             }, 100);
         }
     }
