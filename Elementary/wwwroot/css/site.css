@@ -524,14 +524,6 @@ body {
     color: white;
 }
 
-#StatBlock {
-    margin: 20px auto;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: var(--white);
-}
-
 .team-container {
     font-size: 16px;
     display: flex;
@@ -636,4 +628,63 @@ body {
 .admin-player-answer-count {
     font-size: 24px;
     padding: 5px;
+}
+
+#StatBlock {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.player-stats {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: white;
+    font-size: 18px;
+}
+
+.player-stats .team-info {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin: 4px 0;
+}
+
+.player-stats .team-number {
+    font-weight: bold;
+    font-size: 22px;
+    color: #2c3e50;
+    margin-right: 8px;
+}
+
+.player-stats .player-name2 {
+    font-size: 20px;
+}
+
+.player-stats .answer-group {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    margin: 4px 0;
+}
+
+.player-stats .stats {
+    font-weight: bold;
+    color: #27ae60;
+    min-width: 60px;
+}
+
+.player-stats .errors {
+    color: #c0392b;
+}
+
+.player-stats .error-numbers {
+}
+
+.player-stats .additional-answers .stats {
+    font-weight: bold;
+    color: #2980b9;
 }

@@ -505,28 +505,62 @@ function renderStat(state) {
 
 function toAdminStatPage(players) {
     let html = "";
-    for (let p = 0; p < players.length; p++) {
-        let player = players[p];
+    for (const player of players) {
         let correct = 0;
-        for (let i = 0; i < player.answers.length; i++) {
-            correct += player.answers[i].isCorrect;
+        const wrongAnswers = [];
+        for (const [i, answer] of player.answers.entries()) {
+            if (answer.isCorrect) {
+                correct++;
+            } else {
+                wrongAnswers.push(i + 1);
+            }
         }
 
-        let info1 = "";
-        if (player.answers1) {
+        let additionalInfo = "";
+        if (player.answers1 && player.answers1.length > 0) {
             let correct1 = 0;
-
-            for (let i = 0; i < player.answers1.length; i++) {
-                correct1 += player.answers1[i].isCorrect;
+            const wrongAnswers1 = [];
+            for (const [i, answer] of player.answers1.entries()) {
+                if (answer.isCorrect) {
+                    correct1++;
+                } else {
+                    wrongAnswers1.push(i + 1);
+                }
             }
 
-            info1 = `[${correct1}/${player.answers1.length}]`;
-
+            additionalInfo = `
+                <div class="answer-group additional-answers">                 
+                    <span class="stats">Б: ${correct1}/${player.answers1.length}</span>
+                    ${wrongAnswers1.length ? `
+                    <span class="errors">
+                        Ошибки: <span class="error-numbers">${wrongAnswers1.join(', ')}</span>
+                    </span>` : ''}
+                </div>
+            `;
         }
-        html += `<div class="admin-player-answer-count">#${player.teamNumber} (${player.name}): ${correct}/${player.answers.length} ${info1}</div>`;
+
+        let char = player.answers1 && player.answers1.length > 0 ? 'П:' : 'Б:';
+        html += `
+            <div class="player-stats">
+                <div class="team-info">
+                    <span class="team-number">#${player.teamNumber}</span>
+                    <span class="player-name2">${player.name}</span>
+                </div>
+                
+                ${additionalInfo}                
+              
+                <div class="answer-group main-answers">
+                    <span class="stats">${char} ${correct}/${player.answers.length}</span>
+                    ${wrongAnswers.length ? `
+                    <span class="errors">
+                        Ошибки: <span class="error-numbers">${wrongAnswers.join(', ')}</span>
+                    </span>` : ''}
+                </div>                
+            </div>
+        `;
     }
 
-    let stateBlock = document.getElementById('StatBlock');
+    const stateBlock = document.getElementById('StatBlock');
     if (stateBlock.innerHTML !== html) {
         stateBlock.innerHTML = html;
     }
