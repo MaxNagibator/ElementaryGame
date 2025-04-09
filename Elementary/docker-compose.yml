@@ -1,0 +1,12 @@
+services:
+    app:
+        container_name: elementary
+        image: thevsakeeper/elementary:latest
+        build:
+            context: .
+            dockerfile: elementary/Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:8080
+            - ASPNETCORE_ENVIRONMENT=Production
+        ports:
+            - "2172:8080"

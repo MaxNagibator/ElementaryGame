@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elementary", "Elementary\Elementary.csproj", "{9715B0CE-50AD-4333-98A5-AA26DA27669F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Renamer", "Renamer\Renamer.csproj", "{2F301E4D-9EAE-4862-9C74-BFCF8E086D3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{9715B0CE-50AD-4333-98A5-AA26DA27669F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9715B0CE-50AD-4333-98A5-AA26DA27669F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9715B0CE-50AD-4333-98A5-AA26DA27669F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F301E4D-9EAE-4862-9C74-BFCF8E086D3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F301E4D-9EAE-4862-9C74-BFCF8E086D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F301E4D-9EAE-4862-9C74-BFCF8E086D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F301E4D-9EAE-4862-9C74-BFCF8E086D3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
