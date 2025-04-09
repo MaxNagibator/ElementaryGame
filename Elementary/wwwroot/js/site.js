@@ -458,22 +458,27 @@ function renderStat(state) {
         correct += state.player.answers[i].isCorrect;
     }
 
+    const total = state.player.answers.length;
+    const stars = '★'.repeat(correct) + '☆'.repeat(total - correct); // Генерация строки со звездами
+
     let text;
 
     if (state.level === 1) {
         let result;
 
         if (correct < 3) {
-            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил...Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями»";
+            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил... Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями»";
         } else if (correct < 5) {
             result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады. Внимательно их слушайте :)";
         } else {
-            result = "Великолепно! Кажется, что у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
+            result = "Великолепно! Кажется, у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
         }
-        text = "<div>"
-            + "<label class='stat-label'>" + correct + '/' + state.player.answers.length + "</label>"
-            + "<label class='stat-desc'>" + result + "</label>"
-            + "</div>";
+
+        text = `<div class="result-container">
+            <label class='stat-stars'>${stars}</label>
+            <label class='stat-label'>${correct}/${state.player.answers.length}</label>
+            <label class='stat-desc'>${result}</label>
+        </div>`;
 
     } else {
         let src;
@@ -486,10 +491,12 @@ function renderStat(state) {
         }
 
         text = `<div class="result-container">
+            <label class="stat-stars">${stars}</label>
             <label class="stat-label">${correct}/${state.player.answers.length}</label> 
             <img src="${src}" class="explanation-image" />
         </div>`;
     }
+
     if (prevStatText !== text) {
         document.getElementById('StatBlock').innerHTML = text;
         prevStatText = text;

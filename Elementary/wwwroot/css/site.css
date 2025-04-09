@@ -568,16 +568,13 @@ body {
 }
 
 .mode-page {
-    position: absolute;
-    right: 0;
-    bottom: 0;
     display: flex;
     align-content: center;
     align-items: stretch;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
-    margin: 10px;
+    margin: 52vh 30px 30px;
     padding: 10px;
     gap: 10px;
 }
@@ -589,6 +586,7 @@ body {
 .mode-page button {
     font-size: 18px;
     padding: 16px;
+    width: 100%;
 }
 
 .admin-panel {
@@ -618,6 +616,11 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.result-container .stat-stars {
+    color: #ffab00;
+    font-size: 42px;
 }
 
 .result-container image {
