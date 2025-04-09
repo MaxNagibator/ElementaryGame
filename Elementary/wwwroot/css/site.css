@@ -518,10 +518,10 @@ body {
 }
 
 .player-answer-count.answered {
+    color: white;
     border: 2px solid black;
     border-radius: 10px;
     background: green !important;
-    color: white;
 }
 
 .team-container {
@@ -560,14 +560,17 @@ body {
 }
 
 .mode-page {
+    position: fixed;
+    bottom: 268px;
+    left: 50%;
     display: flex;
     align-content: center;
     align-items: stretch;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
-    margin: 52vh 30px 30px;
     padding: 10px;
+    transform: translate(-50%, -50%);
     gap: 10px;
 }
 
@@ -577,8 +580,8 @@ body {
 
 .mode-page button {
     font-size: 18px;
-    padding: 16px;
     width: 100%;
+    padding: 16px;
 }
 
 .admin-panel {
@@ -611,8 +614,8 @@ body {
 }
 
 .result-container .stat-stars {
-    color: #ffab00;
     font-size: 42px;
+    color: #ffab00;
 }
 
 .result-container image {
@@ -631,33 +634,33 @@ body {
 }
 
 #StatBlock {
-    margin-top: 5px;
     display: flex;
     flex-direction: column;
+    margin-top: 5px;
     gap: 4px;
 }
 
 .player-stats {
+    font-size: 18px;
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: white;
-    font-size: 18px;
 }
 
 .player-stats .team-info {
     display: flex;
-    gap: 8px;
-    justify-content: flex-start;
     align-items: baseline;
+    justify-content: flex-start;
     margin: 4px 0;
+    gap: 8px;
 }
 
 .player-stats .team-number {
-    font-weight: bold;
     font-size: 22px;
-    color: #2c3e50;
+    font-weight: bold;
     margin-right: 8px;
+    color: #2c3e50;
 }
 
 .player-stats .player-name2 {
@@ -666,15 +669,15 @@ body {
 
 .player-stats .answer-group {
     display: flex;
-    gap: 8px;
     align-items: baseline;
     margin: 4px 0;
+    gap: 8px;
 }
 
 .player-stats .stats {
     font-weight: bold;
-    color: #27ae60;
     min-width: 60px;
+    color: #27ae60;
 }
 
 .player-stats .errors {
