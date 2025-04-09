@@ -3,7 +3,8 @@
 
 <div class="text-center main-container"
      style="">
-    <div class="b-container">
+    <div id="TeamBlock"
+         class="b-container">
         <div class="team-container">
             <label id="TeamNumber">
             </label>
@@ -16,28 +17,31 @@
         </div>
     </div>
     <div id="AdminButtons"
-         class="hidden">
-        <button class="btn btn-success"
-                onclick="initGame()">
-            инициализация
-        </button>
-        <button class="btn btn-success"
-                onclick="spinWheel()">
-            Крутить колесо
-        </button>
-        <button class="btn btn-success"
-                onclick="startGame()">
-            начинаем
-        </button>
-        <h2>Выбор уровня</h2>
-        <button class="btn btn-info level-btn active"
-                onclick="setLevel(this, 1)">
-            Начальный
-        </button>
-        <button class="btn btn-info level-btn"
-                onclick="setLevel(this, 2)">
-            Продвинутый
-        </button>
+         class="hidden admin-panel">
+        <div class="panel-group">
+            <button class="btn btn-info level-btn active"
+                    onclick="setLevel(this, 1)">
+                Начальный
+            </button>
+            <button class="btn btn-info level-btn"
+                    onclick="setLevel(this, 2)">
+                Продвинутый
+            </button>
+        </div>
+        <div class="panel-group">
+            <button class="btn btn-success"
+                    onclick="initGame()">
+                Сброс
+            </button>
+            <button class="btn btn-success"
+                    onclick="spinWheel()">
+                Крутить
+            </button>
+            <button class="btn btn-success"
+                    onclick="startGame()">
+                Вопросы
+            </button>
+        </div>
     </div>
 
     <div id="page-1"

@@ -19,6 +19,7 @@ function init() {
         isAdmin = true;
         let btns = document.getElementById('AdminButtons');
         btns.classList.remove('hidden');
+        document.getElementById('TeamBlock').classList.add('hidden');
     }
 
     let id = getCookie(idCookieName);

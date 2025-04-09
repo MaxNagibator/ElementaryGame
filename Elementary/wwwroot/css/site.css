@@ -355,13 +355,9 @@ body {
     font-size: 48px;
 }
 
-.level-btn {
+.level-page .level-btn {
     font-size: 36px;
     padding: 24px;
-}
-
-.level-btn.active {
-    border: 3px solid darkgreen !important;
 }
 
 .question-type-link .option-btn {
@@ -574,9 +570,9 @@ body {
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: center;
+    margin: 10px;
     padding: 10px;
     gap: 10px;
-    margin: 10px;
 }
 
 .mode-page h2 {
@@ -586,4 +582,27 @@ body {
 .mode-page button {
     font-size: 18px;
     padding: 16px;
+}
+
+.admin-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.admin-panel .panel-group {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.admin-panel button {
+    font-size: 18px;
+    width: 100%;
+    padding: 16px;
+}
+
+.admin-panel .level-btn.active {
+    border: 3px solid darkgreen !important;
 }
