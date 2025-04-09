@@ -82,10 +82,10 @@ function drawState() {
             let info = '';
             for (let i = 0; i < state.players.length; i++) {
                 let color = '';
-                if (state.players[i].answers.length === (state.question.id + 1)) {
+                if (state.players[i].answers.length === state.question.id + 1) {
                     color = "answered";
                 }
-                info += `<div class='player-answer-count  ${color}'>#${state.players[i].teamNumber} (${state.players[i].name}): ${state.players[i].answers.length}</div>`;
+                info += `<div class="player-answer-count  ${color}">#${state.players[i].teamNumber} (${state.players[i].name}): ${state.players[i].answers.length}</div>`;
             }
 
             let gameStatusDiv = document.getElementById('GameStatus');
@@ -457,29 +457,40 @@ function renderStat(state) {
     for (let i = 0; i < state.player.answers.length; i++) {
         correct += state.player.answers[i].isCorrect;
     }
-    let result;
-    if (state.level == 1) {
+
+    let text;
+
+    if (state.level === 1) {
+        let result;
+
         if (correct < 3) {
-            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил...Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями».";
+            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил...Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями»";
         } else if (correct < 5) {
-            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады.Внимательно их слушайте:)";
+            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады. Внимательно их слушайте :)";
         } else {
             result = "Великолепно! Кажется, что у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
         }
+        text = "<div>"
+            + "<label class='stat-label'>" + correct + '/' + state.player.answers.length + "</label>"
+            + "<label class='stat-desc'>" + result + "</label>"
+            + "</div>";
+
     } else {
+        let src;
         if (correct < 3) {
-            result = "Не беда! Но рекомендую полистать на досуге учебник по истории химии";
+            src = `/images/results-2/1.png`;
         } else if (correct < 5) {
-            result = "Неплохо!";
+            src = `/images/results-2/2.png`;
         } else {
-            result = "Моё почтение! Теперь я спокоен – есть на кого Россию оставить";
+            src = `/images/results-2/3.png`;
         }
+
+        text = `<div class="result-container">
+            <label class="stat-label">${correct}/${state.player.answers.length}</label> 
+            <img src="${src}" class="explanation-image" />
+        </div>`;
     }
-    let text = "<div>"
-        + "<label class='stat-label'>" + correct + '/' + state.player.answers.length + "</label>"
-        + "<label class='stat-desc'>" + result + "</label>"
-        + "</div>";
-    if (prevStatText != text) {
+    if (prevStatText !== text) {
         document.getElementById('StatBlock').innerHTML = text;
         prevStatText = text;
     }

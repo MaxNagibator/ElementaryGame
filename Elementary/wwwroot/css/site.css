@@ -613,3 +613,19 @@ body {
 .admin-panel .level-btn.active {
     border: 3px solid darkgreen !important;
 }
+
+.result-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.result-container image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 60px;
+    animation: fadeInZoom 0.5s ease-out;
+    border: 1px solid;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
