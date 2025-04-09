@@ -434,7 +434,7 @@ function toQuestionPage(question, answer = null) {
                 if (rect.top < 0 || rect.bottom > window.innerHeight) {
                     explanationContainer.scrollIntoView({
                         behavior: 'smooth',
-                        block: 'start',
+                        block: 'center',
                         inline: 'nearest',
                     });
                 }
@@ -475,9 +475,9 @@ function renderStat(state) {
         }
 
         text = `<div class="result-container">
-            <label class='stat-stars'>${stars}</label>
-            <label class='stat-label'>${correct}/${state.player.answers.length}</label>
-            <label class='stat-desc'>${result}</label>
+            <label class="stat-stars">${stars}</label>
+            <label class="stat-label">${correct}/${state.player.answers.length}</label>
+            <label class="stat-desc">${result}</label>
         </div>`;
 
     } else {
@@ -511,9 +511,26 @@ function toAdminStatPage(players) {
         for (let i = 0; i < player.answers.length; i++) {
             correct += player.answers[i].isCorrect;
         }
-        html += "<div>" + player.teamNumber + " " + player.name + " " + correct + '/' + player.answers.length + "</div>";
+
+        let info1 = "";
+        if (player.answers1) {
+            let correct1 = 0;
+
+            for (let i = 0; i < player.answers1.length; i++) {
+                correct1 += player.answers1[i].isCorrect;
+            }
+
+            info1 = `[${correct1}/${player.answers1.length}]`;
+
+        }
+        html += `<div class="admin-player-answer-count">#${player.teamNumber} (${player.name}): ${correct}/${player.answers.length} ${info1}</div>`;
     }
-    document.getElementById('StatBlock').innerHTML = html;
+
+    let stateBlock = document.getElementById('StatBlock');
+    if (stateBlock.innerHTML !== html) {
+        stateBlock.innerHTML = html;
+    }
+
     changePage(5);
 }
 
