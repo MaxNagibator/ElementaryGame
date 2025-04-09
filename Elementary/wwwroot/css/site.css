@@ -513,8 +513,15 @@ body {
 }
 
 .player-answer-count {
-    display: inline-block;
-    margin-right: 10px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.player-answer-count.answered {
+    border: 2px solid black;
+    border-radius: 10px;
+    background: green !important;
+    color: white;
 }
 
 #StatBlock {

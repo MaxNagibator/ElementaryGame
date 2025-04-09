@@ -20,6 +20,7 @@ function init() {
         let btns = document.getElementById('AdminButtons');
         btns.classList.remove('hidden');
         document.getElementById('TeamBlock').classList.add('hidden');
+        document.getElementById('GameStatus').classList.remove('hidden');
     }
 
     let id = getCookie(idCookieName);
@@ -78,23 +79,18 @@ function drawState() {
 
     if (isAdmin) {
         if (state.gameState === status.started) {
-
             let info = '';
             for (let i = 0; i < state.players.length; i++) {
-                info += "<div class='player-answer-count'>" + state.players[i].teamNumber + ": " + state.players[i].answers.length + "</div>";
+                let color = '';
+                if (state.players[i].answers.length === (state.question.id + 1)) {
+                    color = "answered";
+                }
+                info += `<div class='player-answer-count  ${color}'>#${state.players[i].teamNumber} (${state.players[i].name}): ${state.players[i].answers.length}</div>`;
             }
 
-            let answerContainer = document.getElementById('AnswerBlock');
             let gameStatusDiv = document.getElementById('GameStatus');
-            if (gameStatusDiv) {
-
-            } else {
-                gameStatusDiv = document.createElement('div');
-                gameStatusDiv.id = 'GameStatus';
-                answerContainer.appendChild(gameStatusDiv);
-            }
-
             gameStatusDiv.innerHTML = info;
+
             toQuestionPage(state.question, state.answer);
 
         } else {
