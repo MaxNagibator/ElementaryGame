@@ -435,7 +435,7 @@ function toQuestionPage(question, answer = null) {
                     block: 'center',
                     inline: 'center',
                 });
-            }, 100);
+            }, 300);
         }
     }
 

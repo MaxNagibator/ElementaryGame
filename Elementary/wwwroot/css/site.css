@@ -558,7 +558,7 @@ body {
 
 .mode-page {
     position: fixed;
-    bottom: 268px;
+    bottom: 30%;
     left: 50%;
     display: flex;
     align-content: center;
@@ -569,6 +569,24 @@ body {
     padding: 10px;
     transform: translate(-50%, -50%);
     gap: 10px;
+}
+
+@media (max-height: 1025px) {
+    .mode-page {
+        bottom: 33%;
+    }
+}
+
+@media (max-height: 900px) {
+    .mode-page {
+        bottom: 32%;
+    }
+}
+
+@media (max-height: 700px) {
+    .mode-page {
+        bottom: 26%;
+    }
 }
 
 .mode-page h2 {
