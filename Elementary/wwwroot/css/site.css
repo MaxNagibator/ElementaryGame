@@ -226,6 +226,7 @@ body {
     animation: fadeInZoom 0.5s ease-out;
     border: 1px solid;
     border-radius: 10px;
+    background: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -626,6 +627,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: var(--white);
 }
 
 .result-container .stat-stars {

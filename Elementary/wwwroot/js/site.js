@@ -435,7 +435,7 @@ function toQuestionPage(question, answer = null) {
                     block: 'center',
                     inline: 'center',
                 });
-            }, 300);
+            }, 500);
         }
     }
 
@@ -622,7 +622,7 @@ function renderQuestion(question) {
         questionShow += `
           <div class="text-inputs-container">
             ${Array.from({ length: 3 }, (_, i) => `
-              <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
+              <input type="number" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
             `).join('')}
           </div>
         `;
