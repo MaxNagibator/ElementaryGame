@@ -1,59 +1,64 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<script src="~/js/site.js"
+﻿<script src="~/js/site.js"
         asp-append-version="true"></script>
 
 <div class="text-center main-container"
      style="">
-    <div class="b-container">
-        <label id="TeamNumber">
-        </label>
-        <div id="TeamTitle">
-            <label id="TeamTitleName">
+    <div id="TeamBlock"
+         class="b-container">
+        <div class="team-container">
+            <label id="TeamNumber">
             </label>
-            <image id="TeamTitleImage"
-                   style="width: 50px">
-            </image>
+            <div id="TeamTitle">
+                <label id="TeamTitleName">
+                </label>
+                <image id="TeamTitleImage">
+                </image>
+            </div>
         </div>
     </div>
     <div id="AdminButtons"
          class="hidden">
-        <button class="btn btn-success"
-                onclick="initGame()">
-            инициализация
-        </button>
-        <button class="btn btn-success"
-                onclick="spinWheel()">
-            Крутить колесо
-        </button>
-        <button class="btn btn-success"
-                onclick="startGame()">
-            начинаем
-        </button>
-        <h2>Выбор уровня</h2>
-        <button class="btn btn-info level-btn active"
-                onclick="setLevel(this, 1)">
-            Начальный
-        </button>
-        <button class="btn btn-info level-btn"
-                onclick="setLevel(this, 2)">
-            Продвинутый
-        </button>
+        <div class="admin-panel">
+            <div class="panel-group">
+                <button class="btn btn-info level-btn active"
+                        onclick="setLevel(this, 1)">
+                    Начальный
+                </button>
+                <button class="btn btn-info level-btn"
+                        onclick="setLevel(this, 2)">
+                    Продвинутый
+                </button>
+            </div>
+            <div class="panel-group">
+                <button class="btn btn-success"
+                        onclick="initGame()"
+                        style="font-size: 12px; padding: 12px; margin: 10px">
+                    Сброс
+                </button>
+                <button class="btn btn-success"
+                        onclick="spinWheel()">
+                    Крутить
+                </button>
+                <button class="btn btn-success"
+                        onclick="startGame()">
+                    Вопросы
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="page-1"
          class="game-page">
-        <h2>Выбор режима</h2>
-        <button class="btn btn-info"
-                onclick="setMode(true)">
-            Одиночный
-        </button>
-        <button class="btn btn-info"
-                onclick="setMode(false)">
-            Командный
-        </button>
+        <div class="b-container mode-page">
+            <button class="btn btn-info"
+                    onclick="setMode(true)">
+                Одиночный
+            </button>
+            <button class="btn btn-info"
+                    onclick="setMode(false)">
+                Командный
+            </button>
+        </div>
     </div>
 
     <div id="page-2"
@@ -75,19 +80,27 @@
 
     <div id="page-3"
          class="game-page hidden">
-        <h2>Выбор уровня</h2>
-        <button class="btn btn-info level-btn" id="LevelBtn1"
-                onclick="fakeLevel(this, 1)">
-            Начальный
-        </button>
-        <button class="btn btn-info level-btn" id="LevelBtn2" disabled
-                onclick="fakeLevel(this, 2)">
-            Продвинутый
-        </button>
+        <div class="level-page b-container">
+            <h2>Выбор уровня</h2>
+            <button class="btn btn-info level-btn"
+                    id="LevelBtn1"
+                    onclick="fakeLevel(this, 1)">
+                Начальный
+            </button>
+            <button class="btn btn-info level-btn"
+                    id="LevelBtn2"
+                    disabled
+                    onclick="fakeLevel(this, 2)">
+                Продвинутый
+            </button>
+        </div>
     </div>
 
     <div id="page-4"
          class="game-page hidden">
+        <div id="GameStatus"
+             class="hidden b-container">
+        </div>
         <div id="QuestionBlock"
              class="question-container">
         </div>

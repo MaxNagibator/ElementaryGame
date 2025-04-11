@@ -5,16 +5,15 @@
 @font-face {
     font-family: "Gordita";
     src: url("/fonts/Gordita-Regular.woff2") format("woff2"),
-    url("/fonts/Gordita-Regular.woff") format("woff"),
-    url("/fonts/Gordita-Regular.ttf") format("truetype");
+    url("/fonts/Gordita-Regular.ttf") format("opentype");
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: "Gordita";
-    src: url("/fonts/Gordita-Bold.woff2") format("woff2"),
-    url("/fonts/Gordita-Bold.woff") format("woff");
+    src: url("/fonts/Gordita-Bold.otf") format("opentype"),
+    url("/fonts/Gordita-Bold.woff2") format("woff2");
     font-weight: bold;
     font-style: normal;
 }
@@ -191,14 +190,11 @@ body {
     left: 0;
     display: block;
     box-sizing: border-box;
+    width: auto;
     max-width: 600px;
-    margin: 10px;
-    padding: 15px;
+    margin: 0 auto;
+    padding: 10px;
     animation: slideUp 0.3s ease-out;
-    border: 1px solid;
-    border-radius: 10px;
-    background: var(--white);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .answer-container button {
@@ -230,6 +226,7 @@ body {
     animation: fadeInZoom 0.5s ease-out;
     border: 1px solid;
     border-radius: 10px;
+    background: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -340,8 +337,25 @@ body {
     transform-style: preserve-3d;
 }
 
-.level-btn.active {
-    border: 3px solid darkgreen !important;
+.level-page {
+    display: flex;
+    align-content: center;
+    align-items: stretch;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    margin-top: 20vh;
+    padding: 10px;
+    gap: 10px;
+}
+
+.level-page h2 {
+    font-size: 38px;
+}
+
+.level-page .level-btn {
+    font-size: 32px;
+    padding: 20px;
 }
 
 .question-type-link .option-btn {
@@ -441,25 +455,25 @@ body {
     transition: transform 0.3s ease-out;
 }
 
-.options-table {
+.options-table-link {
     display: grid;
+    align-items: start;
+    margin-top: 20px;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    margin-top: 20px;
-    align-items: start;
 }
 
-.option-label{
+.option-label {
     font-weight: bold;
 }
 
 .option-item {
     display: flex;
     align-items: center;
-    gap: 10px;
     padding: 8px;
-    border: 1px solid #ccc;
     cursor: pointer;
+    border: 1px solid #ccc;
+    gap: 10px;
 }
 
 .option-item:hover {
@@ -468,8 +482,8 @@ body {
 
 .target-option {
     display: flex;
-    flex-direction: row-reverse;
     align-items: center;
+    flex-direction: row-reverse;
     padding: 8px 12px;
     border: 1px dashed #666;
     background: #f9f9f9;
@@ -477,8 +491,8 @@ body {
 
 .target-number {
     font-weight: bold;
-    margin-right: 10px;
     min-width: 24px;
+    margin-right: 10px;
     text-align: right;
 }
 
@@ -492,19 +506,207 @@ body {
     font-weight: 800;
 }
 
-.stat-desc{
+.stat-desc {
     font-size: 20px;
 }
 
 .player-answer-count {
-    display: inline-block;
-    margin-right: 10px;
+    font-size: 16px;
+    padding: 5px;
 }
 
-#StatBlock {
-    margin: 20px auto;
+.player-answer-count.answered {
+    color: white;
+    border: 2px solid black;
+    border-radius: 10px;
+    background: green !important;
+}
+
+.team-container {
+    font-size: 16px;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+.team-container #TeamNumber {
+    font-weight: bold;
+}
+
+.team-container #TeamTitle {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    padding-left: 10px;
+    gap: 10px;
+}
+
+.team-container #TeamTitleImage {
+    width: 50px;
+}
+
+.team-container #TeamTitleName {
+
+}
+
+.mode-page {
+    position: fixed;
+    bottom: 30%;
+    left: 50%;
+    display: flex;
+    align-content: center;
+    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
     padding: 10px;
+    transform: translate(-50%, -50%);
+    gap: 10px;
+}
+
+@media (max-height: 1025px) {
+    .mode-page {
+        bottom: 33%;
+    }
+}
+
+@media (max-height: 900px) {
+    .mode-page {
+        bottom: 32%;
+    }
+}
+
+@media (max-height: 700px) {
+    .mode-page {
+        bottom: 26%;
+    }
+}
+
+.mode-page h2 {
+    font-size: 24px;
+}
+
+.mode-page button {
+    font-size: 18px;
+    width: 100%;
+    padding: 16px;
+}
+
+.admin-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.admin-panel .panel-group {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.admin-panel button {
+    font-size: 18px;
+    width: 100%;
+    padding: 16px;
+}
+
+.admin-panel .level-btn.active {
+    border: 3px solid darkgreen !important;
+}
+
+.result-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: var(--white);
+}
+
+.result-container .stat-stars {
+    font-size: 42px;
+    color: #ffab00;
+}
+
+.result-container image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 60px;
+    animation: fadeInZoom 0.5s ease-out;
+    border: 1px solid;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-player-answer-count {
+    font-size: 24px;
+    padding: 5px;
+}
+
+#StatBlock {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+    gap: 4px;
+}
+
+.player-stats {
+    font-size: 18px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.player-stats .team-info {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    margin: 4px 0;
+    gap: 8px;
+}
+
+.player-stats .team-number {
+    font-size: 22px;
+    font-weight: bold;
+    margin-right: 8px;
+    color: #2c3e50;
+}
+
+.player-stats .player-name2 {
+    font-size: 20px;
+}
+
+.player-stats .answer-group {
+    display: flex;
+    align-items: baseline;
+    margin: 4px 0;
+    gap: 8px;
+}
+
+.player-stats .stats {
+    font-weight: bold;
+    min-width: 60px;
+    color: #27ae60;
+}
+
+.player-stats .errors {
+    color: #c0392b;
+}
+
+.player-stats .error-numbers {
+}
+
+.player-stats .additional-answers .stats {
+    font-weight: bold;
+    color: #2980b9;
 }

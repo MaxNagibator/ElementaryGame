@@ -1,19 +1,11 @@
 ﻿using Elementary.Business;
-using Elementary.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace Elementary.Controllers;
 
 public class HomeController : Controller
 {
-    public static Game GameValue = new();
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
+    private static readonly Game GameValue = new();
 
     public IActionResult Index()
     {
@@ -21,76 +13,37 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public JsonResult Join([FromBody] JoinModel model)
+    public StateResponse Join([FromBody] JoinModel model)
     {
         GameValue.Join(model.PlayerId, model.IsSingle);
-        if(false)
-        {
-            for(int i = 0;i < 11; i++)
-            {
-                GameValue.Join(Guid.NewGuid(), model.IsSingle);
-            }
-        }
-        
         return GetStateInternal(model.PlayerId, false);
     }
 
     [HttpPost]
-    public JsonResult GetState([FromBody] PlayerIdModel model)
+    public StateResponse GetState([FromBody] PlayerIdModel model)
     {
         return GetStateInternal(model.PlayerId, model.IsAdmin);
     }
 
-    private JsonResult GetStateInternal(Guid playerId, bool isAdmin)
-    {
-        var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
-        QuestionModel? questionModel = null;
-
-        var question = GameValue.GetCurrentQuestion();
-        if (GameValue.State == Game.GameState.Started)
-        {
-            questionModel = GetQuestionModel(question);
-        }
-
-        var answer = player?.GetAnswer(GameValue.CurrentQuestionId);
-
-        return new(new
-        {
-            GameState = (int)GameValue.State,
-            Level = GameValue.Level,
-            Player = player,
-            Question = questionModel,
-            Answer = answer,
-            CorrectAnswer = answer == null ? null : question?.Answer,
-
-            Players = GameValue.State != Game.GameState.Started || isAdmin ? GameValue.Players : null,
-            SectorValue = GameValue.SectorValue,
-        });
-    }
-
     [HttpPost]
-    public JsonResult InitGame()
+    public IActionResult InitGame()
     {
         GameValue.InitGame();
-        return new(new { Text = "Vrum Wrum" });
+        return Ok();
     }
 
     [HttpPost]
-    public JsonResult StartGame([FromBody] StartGameModel model)
+    public IActionResult StartGame([FromBody] StartGameModel model)
     {
         GameValue.StartGame(model.Level);
-        return new(new { Text = "Vrum Wrum" });
+        return Ok();
     }
 
     [HttpPost]
-    public JsonResult SpinWhell()
+    public SpinWhellResponse SpinWhell()
     {
         GameValue.SpinWhell();
-
-        return new(new
-        {
-            GameValue.SectorValue,
-        });
+        return new(GameValue.SectorValue);
     }
 
     [HttpPost]
@@ -98,6 +51,46 @@ public class HomeController : Controller
     {
         var question = GameValue.GetNextQuestion();
         return new(GetQuestionModel(question));
+    }
+
+    [HttpPost]
+    public SetAnswerResponse SetAnswer([FromBody] SetAnswerModel model)
+    {
+        var isCorrect = GameValue.SetAnswer(model.PlayerId, model.Value);
+        var currentQuestion = GameValue.GetCurrentQuestion();
+
+        return new(isCorrect, currentQuestion?.Answer);
+    }
+
+    private StateResponse GetStateInternal(Guid playerId, bool isAdmin)
+    {
+        var player = GameValue.Players.FirstOrDefault(x => x.Id == playerId);
+        QuestionModel? questionModel = null;
+
+        var question = GameValue.GetCurrentQuestion();
+
+        if (GameValue.State == Game.GameState.Started)
+        {
+            questionModel = GetQuestionModel(question);
+        }
+
+        var answer = player?.GetAnswer(GameValue.CurrentQuestionId);
+
+        return new()
+        {
+            GameState = (int)GameValue.State,
+            Level = GameValue.Level,
+            Player = player,
+            Question = questionModel,
+            Answer = answer,
+            CorrectAnswer = answer == null
+                ? null
+                : question?.Answer,
+            Players = GameValue.State != Game.GameState.Started || isAdmin
+                ? GameValue.Players
+                : null,
+            SectorValue = GameValue.SectorValue,
+        };
     }
 
     private QuestionModel? GetQuestionModel(Question? question)
@@ -108,6 +101,7 @@ public class HomeController : Controller
         }
 
         var options = question.Options.ToArray();
+
         if (question.Type == "multiple")
         {
             // дорого реализовывать передачу ответа
@@ -124,6 +118,20 @@ public class HomeController : Controller
         };
     }
 
+    public class StateResponse
+    {
+        public int GameState { get; set; }
+        public int Level { get; set; }
+        public Player? Player { get; set; }
+        public QuestionModel? Question { get; set; }
+        public UserAnswer? Answer { get; set; }
+        public string? CorrectAnswer { get; set; }
+        public List<Player>? Players { get; set; }
+        public int? SectorValue { get; set; }
+    }
+
+    public record SpinWhellResponse(int? SectorValue);
+
     public class QuestionModel
     {
         public int Id { get; set; }
@@ -133,24 +141,7 @@ public class HomeController : Controller
         public string[]? TargetOptions { get; set; }
     }
 
-    [HttpPost]
-    public JsonResult SetAnswer([FromBody] SetAnswerModel model)
-    {
-        var isCorrect = GameValue.SetAnswer(model.PlayerId, model.Value);
-        var currentQuestion = GameValue.GetCurrentQuestion();
-
-        return new(new
-        {
-            IsCorrect = isCorrect,
-            currentQuestion.Answer,
-        });
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
+    public record SetAnswerResponse(bool IsCorrect, string? Answer);
 }
 
 public class SetAnswerModel : PlayerIdModel

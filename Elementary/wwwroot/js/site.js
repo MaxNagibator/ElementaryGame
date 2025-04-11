@@ -19,6 +19,8 @@ function init() {
         isAdmin = true;
         let btns = document.getElementById('AdminButtons');
         btns.classList.remove('hidden');
+        document.getElementById('TeamBlock').classList.add('hidden');
+        document.getElementById('GameStatus').classList.remove('hidden');
     }
 
     let id = getCookie(idCookieName);
@@ -77,23 +79,18 @@ function drawState() {
 
     if (isAdmin) {
         if (state.gameState === status.started) {
-
             let info = '';
             for (let i = 0; i < state.players.length; i++) {
-                info += "<div class='player-answer-count'>"+state.players[i].teamNumber + ": " + state.players[i].answers.length+"</div>";
+                let color = '';
+                if (state.players[i].answers.length === state.question.id + 1) {
+                    color = "answered";
+                }
+                info += `<div class="player-answer-count  ${color}">#${state.players[i].teamNumber} (${state.players[i].name}): ${state.players[i].answers.length}</div>`;
             }
 
-            let answerContainer = document.getElementById('AnswerBlock');
             let gameStatusDiv = document.getElementById('GameStatus');
-            if (gameStatusDiv) {
-
-            } else {
-                gameStatusDiv = document.createElement('div');
-                gameStatusDiv.id = 'GameStatus'
-                answerContainer.appendChild(gameStatusDiv);
-            }
-
             gameStatusDiv.innerHTML = info;
+
             toQuestionPage(state.question, state.answer);
 
         } else {
@@ -342,16 +339,20 @@ function loadQuestion() {
 }
 
 var selectValueQuestion;
+
 function toSelectLevelPage(state) {
     prevStatText = null;
     selectValueQuestion = state.question;
-    if (state.player.answers.length > 0) {
+    if (state.level === 2) {
+        document.getElementById('LevelBtn1').disabled = true;
+        document.getElementById('LevelBtn2').disabled = false;
+    }
+    if (selectLevel === state.level || state.player.answers.length > 0) {
         selectLevel = state.level;
         toQuestionPage(state.question, state.answer);
-    }
-    if (selectLevel == null) {
+    } else if (selectLevel == null) {
         changePage(3);
-    } else if (state.player.answers1 != null && selectLevel == 1) {
+    } else if (state.player.answers1 != null && selectLevel === 1) {
         changePage(3);
     }
 }
@@ -384,7 +385,7 @@ function toQuestionPage(question, answer = null) {
             .forEach(btn => btn.classList.remove('active', 'correct-answer', 'disabled'));
     }
 
-    if (answer) {        
+    if (answer) {
         if (currentAnswer !== answer.value) {
             currentAnswer = answer.value;
             const explanationContainer = document.getElementById('Explanation');
@@ -420,20 +421,21 @@ function toQuestionPage(question, answer = null) {
             explanationContainer.classList.add('visible');
 
             const explanationImage = document.createElement('img');
-            explanationImage.src = `/images/explanations/q${question.id + 1}.png`;
+            if (selectLevel === 1) {
+                explanationImage.src = `/images/explanations-1/q${question.id + 1}.png`;
+            } else {
+                explanationImage.src = `/images/explanations-2/q${question.id + 1}.png`;
+            }
             explanationImage.className = 'explanation-image';
             explanationContainer.appendChild(explanationImage);
 
             setTimeout(() => {
-                const rect = explanationContainer.getBoundingClientRect();
-                if (rect.top < 0 || rect.bottom > window.innerHeight) {
-                    explanationContainer.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                        inline: 'nearest',
-                    });
-                }
-            }, 100);
+                explanationContainer.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center',
+                });
+            }, 500);
         }
     }
 
@@ -446,34 +448,53 @@ function toStatPage(state) {
 }
 
 var prevStatText = null;
+
 function renderStat(state) {
     let correct = 0;
     for (let i = 0; i < state.player.answers.length; i++) {
         correct += state.player.answers[i].isCorrect;
     }
-    let result;
-    if (state.level == 1) {
+
+    const total = state.player.answers.length;
+    const stars = '★'.repeat(correct) + '☆'.repeat(total - correct); // Генерация строки со звездами
+
+    let text;
+
+    if (state.level === 1) {
+        let result;
+
         if (correct < 3) {
-            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил...Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями».";
+            result = "«Пу - пу - пу», – вздохнул бы Дмитрий Иванович. – «На кого страну оставил... Ничего, слушайте выступающих внимательно, стало быть и преисполнитесь знаниями»";
         } else if (correct < 5) {
-            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады.Внимательно их слушайте:)"
+            result = "Хорошо! Несколько ошибок – нестрашно, потому что впереди вас ждут увлекательные доклады. Внимательно их слушайте :)";
         } else {
-            result = "Великолепно! Кажется, что у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
+            result = "Великолепно! Кажется, у вас личное знакомство с Менделеевым и компанией... Либо внимательно слушали лекции в течение четырёх лет учёбы!";
         }
+
+        text = `<div class="result-container">
+            <label class="stat-stars">${stars}</label>
+            <label class="stat-label">${correct}/${state.player.answers.length}</label>
+            <label class="stat-desc">${result}</label>
+        </div>`;
+
     } else {
+        let src;
         if (correct < 3) {
-            result = "Не беда! Но рекомендую полистать на досуге учебник по истории химии";
+            src = `/images/results-2/1.png`;
         } else if (correct < 5) {
-            result = "Неплохо!"
+            src = `/images/results-2/2.png`;
         } else {
-            result = "Моё почтение! Теперь я спокоен – есть на кого Россию оставить";
+            src = `/images/results-2/3.png`;
         }
+
+        text = `<div class="result-container">
+            <label class="stat-stars">${stars}</label>
+            <label class="stat-label">${correct}/${state.player.answers.length}</label> 
+            <img src="${src}" class="explanation-image" />
+        </div>`;
     }
-    let text = "<div>"
-        + "<label class='stat-label'>" + correct + '/' + state.player.answers.length + "</label>"
-        + "<label class='stat-desc'>" + result + "</label>"
-        + "</div>";
-    if (prevStatText != text) {
+
+    if (prevStatText !== text) {
         document.getElementById('StatBlock').innerHTML = text;
         prevStatText = text;
     }
@@ -481,15 +502,66 @@ function renderStat(state) {
 
 function toAdminStatPage(players) {
     let html = "";
-    for (let p = 0; p < players.length; p++) {
-        let player = players[p];
+    for (const player of players) {
         let correct = 0;
-        for (let i = 0; i < player.answers.length; i++) {
-            correct += player.answers[i].isCorrect;
+        const wrongAnswers = [];
+        for (const [i, answer] of player.answers.entries()) {
+            if (answer.isCorrect) {
+                correct++;
+            } else {
+                wrongAnswers.push(i + 1);
+            }
         }
-        html += "<div>" + player.teamNumber + " " + player.name +" " + correct + '/' + player.answers.length +"</div>";
+
+        let additionalInfo = "";
+        if (player.answers1 && player.answers1.length > 0) {
+            let correct1 = 0;
+            const wrongAnswers1 = [];
+            for (const [i, answer] of player.answers1.entries()) {
+                if (answer.isCorrect) {
+                    correct1++;
+                } else {
+                    wrongAnswers1.push(i + 1);
+                }
+            }
+
+            additionalInfo = `
+                <div class="answer-group additional-answers">                 
+                    <span class="stats">Б: ${correct1}/${player.answers1.length}</span>
+                    ${wrongAnswers1.length ? `
+                    <span class="errors">
+                        Ошибки: <span class="error-numbers">${wrongAnswers1.join(', ')}</span>
+                    </span>` : ''}
+                </div>
+            `;
+        }
+
+        let char = player.answers1 && player.answers1.length > 0 ? 'П:' : 'Б:';
+        html += `
+            <div class="player-stats">
+                <div class="team-info">
+                    <span class="team-number">#${player.teamNumber}</span>
+                    <span class="player-name2">${player.name}</span>
+                </div>
+                
+                ${additionalInfo}                
+              
+                <div class="answer-group main-answers">
+                    <span class="stats">${char} ${correct}/${player.answers.length}</span>
+                    ${wrongAnswers.length ? `
+                    <span class="errors">
+                        Ошибки: <span class="error-numbers">${wrongAnswers.join(', ')}</span>
+                    </span>` : ''}
+                </div>                
+            </div>
+        `;
     }
-    document.getElementById('StatBlock').innerHTML = html;
+
+    const stateBlock = document.getElementById('StatBlock');
+    if (stateBlock.innerHTML !== html) {
+        stateBlock.innerHTML = html;
+    }
+
     changePage(5);
 }
 
@@ -512,34 +584,45 @@ function renderQuestion(question) {
             `).join('')}</div>`;
     } else if (question.type === 'link') {
         let abc = "ABC";
-        questionShow = `<div class="options-table ${qtype}">`;
+        questionShow = `<div class="options-table-link ${qtype}">`;
 
-        question.options.forEach((option, index) => {
-            questionShow += `
+        let divs = [];
+        question.options.forEach((option, index) =>
+            divs.push(`
             <div class="option-item" data-index="${index}">
               <span class="option-label">${abc[index]}</span>
               <span class="option-text">${option}</span>
             </div>
-          `;
-        });
+          `));
 
+        divs.push('<div></div>');
+
+        let divs2 = [];
         if (question.targetOptions) {
-            question.targetOptions.forEach((target, index) => {
-                questionShow += `
+            question.targetOptions.forEach((target, index) =>
+                divs2.push(`
                   <div class="target-option" data-index="${index}">
                     <span class="target-number">${index + 1}</span>
                     <span class="target-text">${target}</span>
                   </div>
-                `;
-            });
+                `));
         }
 
+        const result = divs.map((element, index) => [
+            element,
+            divs2[index],
+        ]);
+
+        result.forEach(div => {
+            questionShow += div[0];
+            questionShow += div[1];
+        });
         questionShow += '</div>';
 
         questionShow += `
           <div class="text-inputs-container">
             ${Array.from({ length: 3 }, (_, i) => `
-              <input type="text" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
+              <input type="number" placeholder="${abc[i]}" class="text-input" maxlength="1" data-index="${i}">
             `).join('')}
           </div>
         `;
